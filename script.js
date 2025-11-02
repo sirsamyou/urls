@@ -77,10 +77,15 @@ class URLSApp {
     }
 
     bindEvents() {
-        // URLS logo → FAQ
+        // URLS logo → FAQ Modal
         document.getElementById('urls-logo').addEventListener('click', e => {
             e.preventDefault();
-            this.switchPage('faq');
+            this.showFAQ();
+        });
+
+        // Close modal
+        document.querySelector('.close-modal').addEventListener('click', () => {
+            document.getElementById('faq-modal').classList.remove('active');
         });
 
         // hamburger
@@ -130,11 +135,56 @@ class URLSApp {
         document.querySelectorAll('.nav a').forEach(a => a.classList.remove('active'));
         const link = document.querySelector(`[data-page="${p}"]`);
         if (link) link.classList.add('active');
-        if (['speedrun', 'hard', 'leaderboard'].includes(p)) this.lastListPage = p;
+        if (['speedrun', 'hard', 'leaderboard', 'submit'].includes(p)) this.lastListPage = p;
         if (p === 'leaderboard') this.renderLeaderboard();
         else if (p === 'speedrun' || p === 'hard') this.renderLevels(p);
-        else if (p === 'faq') this.renderFAQ();
         this.currentPage = p;
+    }
+
+    showFAQ() {
+        document.getElementById('faq-content').innerHTML = `
+            <h1>URLS Rating System</h1>
+
+            <div class="faq-section">
+                <h3><img src="assets/normalranking.png" alt="Normal"> Speedrun Level Rating</h3>
+                <p>Speedrun maps are rated on three aspects:</p>
+                <ul>
+                    <li><strong>Gameplay:</strong> How fun and fluid the level is to play (0–10)</li>
+                    <li><strong>Design:</strong> Visuals, layout, creativity (0–10)</li>
+                    <li><strong>Speedrunning:</strong> How well it supports speedrun strategies (0–10)</li>
+                </ul>
+            </div>
+
+            <div class="faq-section">
+                <h3><img src="assets/epicranking.png" alt="Epic"> Rank System</h3>
+                <p>Only levels with <strong>10+ total points</strong> are ranked:</p>
+                <ul>
+                    <li><img src="assets/normalranking.png" width="24" style="vertical-align:middle;"> <strong>Normal:</strong> 10 – 17.9 / 30</li>
+                    <li><img src="assets/epicranking.png" width="24" style="vertical-align:middle;"> <strong>Epic:</strong> 18 – 22.9 / 30</li>
+                    <li><img src="assets/legendaryranking.png" width="24" style="vertical-align:middle;"> <strong>Legendary:</strong> 23 – 26.9 / 30</li>
+                    <li><img src="assets/mythicranking.png" width="24" style="vertical-align:middle;"> <strong>Mythic:</strong> 27+ / 30</li>
+                </ul>
+            </div>
+
+            <div class="faq-section">
+                <h3>Hard Levels</h3>
+                <p>Hard levels use the old system (Speedrun, Design, Difficulty) for now.</p>
+            </div>
+
+            <div class="faq-section">
+                <h3>Team</h3>
+                <div class="team-grid">
+                    <div class="team-member"><strong>j89de</strong><span>Founder & Rater</span></div>
+                    <div class="team-member"><strong>sqm</strong><span>Designer</span></div>
+                    <div class="team-member"><strong>Ch4mpY</strong><span>Rater</span></div>
+                    <div class="team-member"><strong>Polar</strong><span>Rater</span></div>
+                    <div class="team-member"><strong>Ripted</strong><span>Rater</span></div>
+                </div>
+            </div>
+
+            <p style="margin-top:2rem;font-style:italic;text-align:center;">Made with passion for the community</p>
+        `;
+        document.getElementById('faq-modal').classList.add('active');
     }
 
     filterSort(type, search, sort) {
@@ -173,9 +223,9 @@ class URLSApp {
                             <span class="creator-link" data-creator="${l.creator}">${l.creator}</span>
                         </div>
                         <p><strong>Created:</strong> ${new Date(l.created).toLocaleDateString()}</p>
-                        <div style="display:flex;align-items:center;gap:.5rem;margin-top:.5rem;">
+                        <div style="display:flex;align-items:center;gap:.4rem;margin-top:.5rem;">
                             ${rankIcon}
-                            <span style="font-size:.9rem;color:#aaa;">${ratings}/30</span>
+                            <span style="font-size:.85rem;color:#aaa;">${ratings}/30</span>
                         </div>
                     </div>
                 </div>
@@ -204,7 +254,7 @@ class URLSApp {
         if (type === 'speedrun') {
             total = lvl.ratings.gameplay + lvl.ratings.design + lvl.ratings.speedrunning;
             rank = this.getRank(total);
-            rankIcon = rank ? `<img src="${this.getRankIcon(rank)}" style="width:50px;height:50px;" alt="${rank}">` : '';
+            rankIcon = rank ? `<img src="${this.getRankIcon(rank)}" style="width:40px;height:40px;" alt="${rank}">` : '';
         } else {
             total = lvl.ratings.speedrun + lvl.ratings.design + lvl.ratings.difficulty;
             rank = null;
@@ -247,14 +297,17 @@ class URLSApp {
                     <h3>Ratings</h3>
                     ${type === 'speedrun' ? `
                     <div class="rating-item">
+                        <img src="assets/normalranking.png" alt="Gameplay">
                         <span>Gameplay</span>
                         <span class="rating-value">${lvl.ratings.gameplay}/10</span>
                     </div>
                     <div class="rating-item">
+                        <img src="assets/normalranking.png" alt="Design">
                         <span>Design</span>
                         <span class="rating-value">${lvl.ratings.design}/10</span>
                     </div>
                     <div class="rating-item">
+                        <img src="assets/normalranking.png" alt="Speedrunning">
                         <span>Speedrunning</span>
                         <span class="rating-value">${lvl.ratings.speedrunning}/10</span>
                     </div>
@@ -281,34 +334,6 @@ class URLSApp {
         });
 
         this.switchPage('level-detail-page');
-    }
-
-    renderFAQ() {
-        document.getElementById('faq-content').innerHTML = `
-            <h1>URLS Rating System FAQ</h1>
-            <p>Welcome to the <strong>Unofficial Rating Levels System</strong>! Here's how speedrun levels are rated:</p>
-
-            <h3>Speedrun Level Rating (3 Criteria)</h3>
-            <ul>
-                <li><strong>Gameplay:</strong> How fun and fluid the level is to play (0–10)</li>
-                <li><strong>Design:</strong> Visuals, layout, creativity (0–10)</li>
-                <li><strong>Speedrunning:</strong> How well it supports speedrun strategies (0–10)</li>
-            </ul>
-
-            <h3>Rank System</h3>
-            <p>Only levels with <strong>10+ total points</strong> are ranked:</p>
-            <ul>
-                <li><strong>Normal:</strong> 10 – 17.9 / 30</li>
-                <li><strong>Epic:</strong> 18 – 22.9 / 30</li>
-                <li><strong>Legendary:</strong> 23 – 26.9 / 30</li>
-                <li><strong>Mythic:</strong> 27+ / 30</li>
-            </ul>
-
-            <h3>Hard Levels</h3>
-            <p>Hard levels use the old system (Speedrun, Design, Difficulty) for now.</p>
-
-            <p style="margin-top:2rem;font-style:italic;">Made with love by the community</p>
-        `;
     }
 
     showCreatorPage(name) {
@@ -344,9 +369,9 @@ class URLSApp {
                             <h3>${l.name}</h3>
                             <p><strong>Type:</strong> ${l.type.charAt(0).toUpperCase() + l.type.slice(1)}</p>
                             <p><strong>Created:</strong> ${new Date(l.created).toLocaleDateString()}</p>
-                            <div style="display:flex;align-items:center;gap:.5rem;margin-top:.5rem;">
+                            <div style="display:flex;align-items:center;gap:.4rem;margin-top:.5rem;">
                                 ${rankIcon}
-                                <span style="font-size:.9rem;color:#aaa;">${ratings}/30</span>
+                                <span style="font-size:.85rem;color:#aaa;">${ratings}/30</span>
                             </div>
                         </div>
                     </div>
