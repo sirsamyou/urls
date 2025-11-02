@@ -127,7 +127,7 @@ h2{
     border:2px solid #00c6ff;
 }
 .rank-badge{
-    width:24px;height:24px;object-fit:contain;
+    width:24px !important;height:24px !important;object-fit:contain;
     filter:drop-shadow(0 0 4px rgba(0,198,255,.5));
 }
 
@@ -198,6 +198,20 @@ h2{
     background:linear-gradient(90deg,#00c6ff,#ff7e5f);
     -webkit-background-clip:text;
     -webkit-text-fill-color:transparent;
+}
+
+/* ---------- LEADERBOARD TABS ---------- */
+.leaderboard-tabs{
+    display:flex;gap:.5rem;margin-bottom:1.5rem;flex-wrap:wrap;
+}
+.lb-tab{
+    background:#1e1e28;border:none;color:#aaa;
+    padding:.6rem 1rem;border-radius:8px;
+    font-size:.95rem;cursor:pointer;transition:all .3s;
+}
+.lb-tab:hover{background:#2a2a33;color:#e0e0e0;}
+.lb-tab.active{
+    background:#00c6ff;color:#fff;box-shadow:0 0 10px rgba(0,198,255,.5);
 }
 
 /* ---------- SUBMIT PAGE ---------- */
@@ -284,7 +298,7 @@ h2{
     -webkit-text-fill-color:transparent;
 }
 .profile-stats{
-    display:flex;gap:2rem;font-size:1rem;color:#ccc;
+    display:flex;gap:2rem;font-size:1rem;color:#ccc;flex-wrap:wrap;
 }
 .profile-stat strong{
     background:linear-gradient(90deg,#00c6ff,#ff7e5f);
@@ -353,7 +367,7 @@ h2{
     .nav.active{right:0;}
     .nav ul{flex-direction:column;gap:2rem;margin-top:4rem;}
     .nav a{font-size:1.2rem;}
-    भी .header-container{justify-content:space-between;}
+    .header-container{justify-content:space-between;}
     .filter-bar{flex-direction:column;align-items:stretch;}
     .filter-bar input{min-width:auto;}
     .sort-btns{justify-content:center;}
@@ -363,4 +377,5 @@ h2{
     .level-id-bar{flex-direction:column;gap:.8rem;text-align:center;}
     .level-id-bar input{font-size:1rem;}
     .team-grid{grid-template-columns:1fr;}
+    .leaderboard-tabs{justify-content:center;}
 }
