@@ -5,6 +5,7 @@ class URLSApp {
         this.hardLevels = [];
         this.profiles = new Map();
         this.creators = new Map();
+        this.currentLeaderboard = 'points';
         this.currentPage = 'speedrun';
         this.lastListPage = 'speedrun';
         this.init();
@@ -50,30 +51,44 @@ class URLSApp {
         const all = [...this.speedrunLevels, ...this.hardLevels];
         all.forEach(lvl => {
             const c = lvl.creator;
-            if (!this.creators.has(c)) this.creators.set(c, { levels: [], total: 0, count: 0 });
+            if (!this.creators.has(c)) {
+                this.creators.set(c, {
+                    levels: [], totalPoints: 0, speedrunCount: 0, hardCount: 0
+                });
+            }
             const data = this.creators.get(c);
             data.levels.push(lvl);
 
-            let sum, cnt;
+            let sum;
             if (lvl.type === 'speedrun') {
                 sum = lvl.ratings.gameplay + lvl.ratings.design + lvl.ratings.speedrunning;
-                cnt = 3;
+                data.speedrunCount++;
             } else {
                 sum = lvl.ratings.speedrun + lvl.ratings.design + lvl.ratings.difficulty;
-                cnt = 3;
+                data.hardCount++;
             }
-            data.total += sum / cnt;
-            data.count++;
+            data.totalPoints += sum / 10; // Every 10 points = 1 Creator Point
         });
         this.creators.forEach(d => {
-            d.avgRating = d.total / d.count;
             d.totalLevels = d.levels.length;
         });
     }
 
     calculateLeaderboard() {
-        const sorted = [...this.creators.entries()].sort(([, a], [, b]) => b.avgRating - a.avgRating);
-        sorted.forEach(([, d], i) => d.position = i + 1);
+        // Pre-calculate positions for each type
+        const creators = [...this.creators.entries()];
+
+        const byPoints = creators.sort(([,a],[,b]) => b.totalPoints - a.totalPoints);
+        byPoints.forEach(([name], i) => this.creators.get(name).posPoints = i + 1);
+
+        const byTotal = creators.sort(([,a],[,b]) => b.totalLevels - a.totalLevels);
+        byTotal.forEach(([name], i) => this.creators.get(name).posTotal = i + 1);
+
+        const bySpeedrun = creators.filter(([,d]) => d.speedrunCount > 0).sort(([,a],[,b]) => b.speedrunCount - a.speedrunCount);
+        bySpeedrun.forEach(([name], i) => this.creators.get(name).posSpeedrun = i + 1);
+
+        const byHard = creators.filter(([,d]) => d.hardCount > 0).sort(([,a],[,b]) => b.hardCount - a.hardCount);
+        byHard.forEach(([name], i) => this.creators.get(name).posHard = i + 1);
     }
 
     bindEvents() {
@@ -92,6 +107,16 @@ class URLSApp {
         document.querySelectorAll('.back-btn').forEach(btn => {
             btn.addEventListener('click', () => {
                 this.switchPage(this.lastListPage);
+            });
+        });
+
+        // leaderboard tabs
+        document.querySelectorAll('.lb-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.lb-tab').forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                this.currentLeaderboard = tab.dataset.lb;
+                this.renderLeaderboard();
             });
         });
 
@@ -157,6 +182,13 @@ class URLSApp {
             </div>
 
             <div class="faq-section">
+                <h3><img src="assets/normalranking.png" alt="Points"> Creator Points</h3>
+                <p>Every <strong>10 rating points</strong> a level earns = <strong>1 Creator Point</strong>.</p>
+                <p><strong>Example:</strong> A level rated <strong>14/30</strong> gives <strong>1.4 Creator Points</strong>.</p>
+                <p>These points are used in the <strong>Creator Points Leaderboard</strong>.</p>
+            </div>
+
+            <div class="faq-section">
                 <h3>Hard Levels</h3>
                 <p>Hard levels use the old system (Speedrun, Design, Difficulty) for now.</p>
             </div>
@@ -181,8 +213,8 @@ class URLSApp {
         if (search) list = list.filter(l => l.name.toLowerCase().includes(search.toLowerCase()) || l.creator.toLowerCase().includes(search.toLowerCase()));
         if (sort === 'rated') {
             list.sort((a, b) => {
-                const avgA = Object.values(a.ratings).reduce((s, v) => s + v, 0) / Object.keys(a.ratings).length;
-                const avgB = Object.values(b.ratings).reduce((s, v) => s + v, 0) / Object.keys(b.ratings).length;
+                const avgA = Object.values(a.ratings).reduce((s, v) => s + v, 0) / 3;
+                const avgB = Object.values(b.ratings).reduce((s, v) => s + v, 0) / 3;
                 return avgB - avgA;
             });
         } else {
@@ -209,7 +241,7 @@ class URLSApp {
                         <h3>${l.name}</h3>
                         <div class="creator-info">
                             <img src="${profile.avatar}" alt="${l.creator}">
-                            <span class="creator-link" data-creator="${l.creator}">${l.creator}</span>
+                            <span><strong>Creator:</strong> <span class="creator-link" data-creator="${l.creator}">${l.creator}</span></span>
                         </div>
                         <p><strong>Created:</strong> ${new Date(l.created).toLocaleDateString()}</p>
                         <div style="display:flex;align-items:center;gap:.4rem;margin-top:.5rem;">
@@ -256,7 +288,7 @@ class URLSApp {
                 <h1>${lvl.name}</h1>
                 <div class="creator-info" style="margin:1rem 0;">
                     <img src="${profile.avatar}" alt="${lvl.creator}" style="width:32px;height:32px;border-radius:50%;border:2px solid #00c6ff;">
-                    <span class="creator-link" data-creator="${lvl.creator}" style="font-size:1.1rem;">${lvl.creator}</span>
+                    <span><strong>Creator:</strong> <span class="creator-link" data-creator="${lvl.creator}" style="font-size:1.1rem;">${lvl.creator}</span></span>
                 </div>
                 <p><strong>Created:</strong> ${new Date(lvl.created).toLocaleDateString()}</p>
 
@@ -330,8 +362,8 @@ class URLSApp {
             let filtered = levels.filter(l => l.name.toLowerCase().includes(search.toLowerCase()));
             if (sort === 'rated') {
                 filtered.sort((a, b) => {
-                    const avgA = Object.values(a.ratings).reduce((s, v) => s + v, 0) / Object.keys(a.ratings).length;
-                    const avgB = Object.values(b.ratings).reduce((s, v) => s + v, 0) / Object.keys(b.ratings).length;
+                    const avgA = Object.values(a.ratings).reduce((s, v) => s + v, 0) / 3;
+                    const avgB = Object.values(b.ratings).reduce((s, v) => s + v, 0) / 3;
                     return avgB - avgA;
                 });
             } else {
@@ -371,9 +403,12 @@ class URLSApp {
                 <div class="profile-info">
                     <h1>${name}</h1>
                     <div class="profile-stats">
-                        <div class="profile-stat"><strong>${data.totalLevels}</strong> Levels</div>
-                        <div class="profile-stat"><strong>#${data.position}</strong> Leaderboard</div>
-                        <div class="profile-stat"><strong>${data.avgRating.toFixed(1)}/10</strong> Avg Rating</div>
+                        <div class="profile-stat"><strong>${data.totalPoints.toFixed(2)}</strong> Creator Points</div>
+                        <div class="profile-stat"><strong>#${data.posPoints || '-'}</strong> Points Rank</div>
+                        <div class="profile-stat"><strong>${data.totalLevels}</strong> Total Maps</div>
+                        <div class="profile-stat"><strong>#${data.posTotal || '-'}</strong> Maps Rank</div>
+                        <div class="profile-stat"><strong>${data.speedrunCount}</strong> Speedrun</div>
+                        <div class="profile-stat"><strong>${data.hardCount}</strong> Hard</div>
                     </div>
                 </div>
             </div>
@@ -407,26 +442,45 @@ class URLSApp {
     }
 
     renderLeaderboard() {
-        const sorted = [...this.creators.entries()].sort(([, a], [, b]) => b.avgRating - a.avgRating);
+        let sorted = [];
+        const type = this.currentLeaderboard;
+
+        if (type === 'points') {
+            sorted = [...this.creators.entries()].sort(([,a],[,b]) => b.totalPoints - a.totalPoints);
+        } else if (type === 'total') {
+            sorted = [...this.creators.entries()].sort(([,a],[,b]) => b.totalLevels - a.totalLevels);
+        } else if (type === 'speedrun') {
+            sorted = [...this.creators.entries()].filter(([,d]) => d.speedrunCount > 0).sort(([,a],[,b]) => b.speedrunCount - a.speedrunCount);
+        } else if (type === 'hard') {
+            sorted = [...this.creators.entries()].filter(([,d]) => d.hardCount > 0).sort(([,a],[,b]) => b.hardCount - a.hardCount);
+        }
+
         const container = document.getElementById('leaderboard-list');
-        container.innerHTML = sorted.map(([c, d]) => {
-            const profile = this.profiles.get(c) || { avatar: 'thumbs/default-avatar.png', banner: 'thumbs/default-banner.jpg' };
+        container.innerHTML = sorted.map(([name, d], i) => {
+            const profile = this.profiles.get(name) || { avatar: 'thumbs/default-avatar.png', banner: 'thumbs/default-banner.jpg' };
+            let value = '';
+            if (type === 'points') value = `${d.totalPoints.toFixed(2)} CP`;
+            else if (type === 'total') value = `${d.totalLevels} Maps`;
+            else if (type === 'speedrun') value = `${d.speedrunCount} Speedrun`;
+            else if (type === 'hard') value = `${d.hardCount} Hard`;
+
             return `
-                <div class="leaderboard-card" data-creator="${c}">
-                    <img src="${profile.banner}" class="leaderboard-banner" alt="${c}'s banner">
+                <div class="leaderboard-card" data-creator="${name}">
+                    <img src="${profile.banner}" class="leaderboard-banner" alt="${name}'s banner">
                     <div class="leaderboard-content">
                         <div class="leaderboard-info">
-                            <img src="${profile.avatar}" class="leaderboard-avatar" alt="${c}">
+                            <img src="${profile.avatar}" class="leaderboard-avatar" alt="${name}">
                             <div>
-                                <h3><span class="creator-link" data-creator="${c}">${c}</span></h3>
-                                <p class="avg-rating">Avg: ${d.avgRating.toFixed(1)}/10 | ${d.totalLevels} Levels</p>
+                                <h3><span class="creator-link" data-creator="${name}">${name}</span></h3>
+                                <p class="avg-rating">${value}</p>
                             </div>
                         </div>
-                        <span class="position">#${d.position}</span>
+                        <span class="position">#${i + 1}</span>
                     </div>
                 </div>
             `;
         }).join('');
+
         container.querySelectorAll('.leaderboard-card').forEach(card => {
             card.addEventListener('click', () => {
                 this.showCreatorPage(card.dataset.creator);
