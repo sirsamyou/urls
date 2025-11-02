@@ -3,7 +3,7 @@ class URLSApp {
     constructor() {
         this.speedrunLevels = [];
         this.hardLevels = [];
-        this.profiles = new Map(); // name → {avatar, banner}
+        this.profiles = new Map();
         this.creators = new Map();
         this.currentPage = 'speedrun';
         this.lastListPage = 'speedrun';
@@ -33,6 +33,19 @@ class URLSApp {
         } catch (e) { console.error('Profiles load error:', e); }
     }
 
+    getRank(total) {
+        if (total < 10) return null;
+        if (total < 18) return 'normal';
+        if (total < 23) return 'epic';
+        if (total < 27) return 'legendary';
+        return 'mythic';
+    }
+
+    getRankIcon(rank) {
+        if (!rank) return '';
+        return `assets/${rank}ranking.png`;
+    }
+
     aggregateCreators() {
         const all = [...this.speedrunLevels, ...this.hardLevels];
         all.forEach(lvl => {
@@ -40,10 +53,15 @@ class URLSApp {
             if (!this.creators.has(c)) this.creators.set(c, { levels: [], total: 0, count: 0 });
             const data = this.creators.get(c);
             data.levels.push(lvl);
-            const sum = lvl.type === 'speedrun'
-                ? lvl.ratings.gameplay + lvl.ratings.design
-                : lvl.ratings.speedrun + lvl.ratings.design + lvl.ratings.difficulty;
-            const cnt = lvl.type === 'speedrun' ? 2 : 3;
+
+            let sum, cnt;
+            if (lvl.type === 'speedrun') {
+                sum = lvl.ratings.gameplay + lvl.ratings.design + lvl.ratings.speedrunning;
+                cnt = 3;
+            } else {
+                sum = lvl.ratings.speedrun + lvl.ratings.design + lvl.ratings.difficulty;
+                cnt = 3;
+            }
             data.total += sum / cnt;
             data.count++;
         });
@@ -59,7 +77,13 @@ class URLSApp {
     }
 
     bindEvents() {
-        // hamburger menu
+        // URLS logo → FAQ
+        document.getElementById('urls-logo').addEventListener('click', e => {
+            e.preventDefault();
+            this.switchPage('faq');
+        });
+
+        // hamburger
         document.querySelector('.hamburger').addEventListener('click', () => {
             document.querySelector('.nav').classList.toggle('active');
         });
@@ -109,15 +133,8 @@ class URLSApp {
         if (['speedrun', 'hard', 'leaderboard'].includes(p)) this.lastListPage = p;
         if (p === 'leaderboard') this.renderLeaderboard();
         else if (p === 'speedrun' || p === 'hard') this.renderLevels(p);
+        else if (p === 'faq') this.renderFAQ();
         this.currentPage = p;
-    }
-
-    getRatingGradient(rating) {
-        if (rating < 3) return 'linear-gradient(90deg, #666, #888)';
-        if (rating < 5) return 'linear-gradient(90deg, #ff5e5e, #ff8c5e)';
-        if (rating < 7) return 'linear-gradient(90deg, #ffcc00, #ffeb3b)';
-        if (rating < 8.5) return 'linear-gradient(90deg, #5eff5e, #8cff5e)';
-        return 'linear-gradient(90deg, #00c6ff, #0099cc)';
     }
 
     filterSort(type, search, sort) {
@@ -140,7 +157,11 @@ class URLSApp {
     renderList(type, levels) {
         const container = document.getElementById(type === 'speedrun' ? 'speedrun-list' : 'hard-list');
         container.innerHTML = levels.map(l => {
-            const avg = (Object.values(l.ratings).reduce((s, v) => s + v, 0) / Object.keys(l.ratings).length).toFixed(1);
+            const ratings = type === 'speedrun'
+                ? l.ratings.gameplay + l.ratings.design + l.ratings.speedrunning
+                : l.ratings.speedrun + l.ratings.design + l.ratings.difficulty;
+            const rank = this.getRank(ratings);
+            const rankIcon = rank ? `<img src="${this.getRankIcon(rank)}" class="rank-badge" alt="${rank} rank">` : '';
             const profile = this.profiles.get(l.creator) || { avatar: 'thumbs/default-avatar.png' };
             return `
                 <div class="level-card" data-id="${l.id}" data-type="${type}">
@@ -152,9 +173,10 @@ class URLSApp {
                             <span class="creator-link" data-creator="${l.creator}">${l.creator}</span>
                         </div>
                         <p><strong>Created:</strong> ${new Date(l.created).toLocaleDateString()}</p>
-                        <p class="rating" style="background:${this.getRatingGradient(avg)};-webkit-background-clip:text;">
-                            ${avg}/10
-                        </p>
+                        <div style="display:flex;align-items:center;gap:.5rem;margin-top:.5rem;">
+                            ${rankIcon}
+                            <span style="font-size:.9rem;color:#aaa;">${ratings}/30</span>
+                        </div>
                     </div>
                 </div>
             `;
@@ -176,10 +198,18 @@ class URLSApp {
         const lvl = list.find(l => l.id == id);
         if (!lvl) return;
 
-        const ratings = Object.entries(lvl.ratings).map(([k, v]) => `
-            <p><strong>${k.charAt(0).toUpperCase() + k.slice(1)}:</strong> ${v}/10</p>
-        `).join('');
         const profile = this.profiles.get(lvl.creator) || { avatar: 'thumbs/default-avatar.png' };
+
+        let total, rank, rankIcon;
+        if (type === 'speedrun') {
+            total = lvl.ratings.gameplay + lvl.ratings.design + lvl.ratings.speedrunning;
+            rank = this.getRank(total);
+            rankIcon = rank ? `<img src="${this.getRankIcon(rank)}" style="width:50px;height:50px;" alt="${rank}">` : '';
+        } else {
+            total = lvl.ratings.speedrun + lvl.ratings.design + lvl.ratings.difficulty;
+            rank = null;
+            rankIcon = '';
+        }
 
         document.getElementById('level-detail-content').innerHTML = `
             <img src="${lvl.thumbnail}" class="level-detail-img" alt="${lvl.name}">
@@ -190,17 +220,59 @@ class URLSApp {
                     <span class="creator-link" data-creator="${lvl.creator}" style="font-size:1.1rem;">${lvl.creator}</span>
                 </div>
                 <p><strong>Created:</strong> ${new Date(lvl.created).toLocaleDateString()}</p>
+
+                ${type === 'speedrun' ? `
+                <div style="text-align:center;margin:1.5rem 0;">
+                    ${rankIcon}
+                    <p style="font-size:1.4rem;font-weight:700;margin-top:.5rem;">
+                        <span style="background:linear-gradient(90deg,#00c6ff,#ff7e5f);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">
+                            ${total}/30
+                        </span>
+                    </p>
+                </div>
+                ` : ''}
+
                 <div class="level-id-bar">
                     <span class="id-label">ID:</span>
                     <input type="text" value="${lvl.id}" readonly>
-                    <button class="copy-btn" onclick="navigator.clipboard.writeText('${lvl.id}').then(() => alert('ID copied!'))">
+                    <button class="copy-btn" onclick="navigator.clipboard.writeText('${lvl.id}')">
                         <i class="fas fa-copy"></i> Copy
                     </button>
                     <a href="${lvl.link}" target="_blank" class="play-btn">
                         <i class="fas fa-play"></i> Play
                     </a>
                 </div>
-                <div class="ratings"><h3>Ratings</h3>${ratings}</div>
+
+                <div class="ratings">
+                    <h3>Ratings</h3>
+                    ${type === 'speedrun' ? `
+                    <div class="rating-item">
+                        <span>Gameplay</span>
+                        <span class="rating-value">${lvl.ratings.gameplay}/10</span>
+                    </div>
+                    <div class="rating-item">
+                        <span>Design</span>
+                        <span class="rating-value">${lvl.ratings.design}/10</span>
+                    </div>
+                    <div class="rating-item">
+                        <span>Speedrunning</span>
+                        <span class="rating-value">${lvl.ratings.speedrunning}/10</span>
+                    </div>
+                    ` : `
+                    <div class="rating-item">
+                        <span>Speedrun</span>
+                        <span class="rating-value">${lvl.ratings.speedrun}/10</span>
+                    </div>
+                    <div class="rating-item">
+                        <span>Design</span>
+                        <span class="rating-value">${lvl.ratings.design}/10</span>
+                    </div>
+                    <div class="rating-item">
+                        <span>Difficulty</span>
+                        <span class="rating-value">${lvl.ratings.difficulty}/10</span>
+                    </div>
+                    `}
+                </div>
             </div>
         `;
 
@@ -209,6 +281,34 @@ class URLSApp {
         });
 
         this.switchPage('level-detail-page');
+    }
+
+    renderFAQ() {
+        document.getElementById('faq-content').innerHTML = `
+            <h1>URLS Rating System FAQ</h1>
+            <p>Welcome to the <strong>Unofficial Rating Levels System</strong>! Here's how speedrun levels are rated:</p>
+
+            <h3>Speedrun Level Rating (3 Criteria)</h3>
+            <ul>
+                <li><strong>Gameplay:</strong> How fun and fluid the level is to play (0–10)</li>
+                <li><strong>Design:</strong> Visuals, layout, creativity (0–10)</li>
+                <li><strong>Speedrunning:</strong> How well it supports speedrun strategies (0–10)</li>
+            </ul>
+
+            <h3>Rank System</h3>
+            <p>Only levels with <strong>10+ total points</strong> are ranked:</p>
+            <ul>
+                <li><strong>Normal:</strong> 10 – 17.9 / 30</li>
+                <li><strong>Epic:</strong> 18 – 22.9 / 30</li>
+                <li><strong>Legendary:</strong> 23 – 26.9 / 30</li>
+                <li><strong>Mythic:</strong> 27+ / 30</li>
+            </ul>
+
+            <h3>Hard Levels</h3>
+            <p>Hard levels use the old system (Speedrun, Design, Difficulty) for now.</p>
+
+            <p style="margin-top:2rem;font-style:italic;">Made with love by the community</p>
+        `;
     }
 
     showCreatorPage(name) {
@@ -232,7 +332,11 @@ class URLSApp {
             }
             const grid = document.querySelector('#creator-profile-content .levels-grid');
             grid.innerHTML = filtered.map(l => {
-                const avg = (Object.values(l.ratings).reduce((s, v) => s + v, 0) / Object.keys(l.ratings).length).toFixed(1);
+                const ratings = l.type === 'speedrun'
+                    ? l.ratings.gameplay + l.ratings.design + l.ratings.speedrunning
+                    : l.ratings.speedrun + l.ratings.design + l.ratings.difficulty;
+                const rank = l.type === 'speedrun' ? this.getRank(ratings) : null;
+                const rankIcon = rank ? `<img src="${this.getRankIcon(rank)}" class="rank-badge" alt="${rank}">` : '';
                 return `
                     <div class="level-card" data-id="${l.id}" data-type="${l.type}">
                         <img src="${l.thumbnail}" alt="${l.name}">
@@ -240,9 +344,10 @@ class URLSApp {
                             <h3>${l.name}</h3>
                             <p><strong>Type:</strong> ${l.type.charAt(0).toUpperCase() + l.type.slice(1)}</p>
                             <p><strong>Created:</strong> ${new Date(l.created).toLocaleDateString()}</p>
-                            <p class="rating" style="background:${this.getRatingGradient(avg)};-webkit-background-clip:text;">
-                                ${avg}/10
-                            </p>
+                            <div style="display:flex;align-items:center;gap:.5rem;margin-top:.5rem;">
+                                ${rankIcon}
+                                <span style="font-size:.9rem;color:#aaa;">${ratings}/30</span>
+                            </div>
                         </div>
                     </div>
                 `;
