@@ -14,7 +14,7 @@ class URLSApp {
         await this.loadData();
         await this.loadProfiles();
         this.aggregateCreators();
-        this.calculateLeaderboard(); 
+        this.calculateLeaderboard();
         this.render();
         this.bindEvents();
     }
@@ -210,7 +210,7 @@ class URLSApp {
             const ratings = type === 'speedrun'
                 ? l.ratings.gameplay + l.ratings.design + l.ratings.speedrunning
                 : l.ratings.speedrun + l.ratings.design + l.ratings.difficulty;
-            const rank = this.getRank(ratings);
+            const rank = type === 'speedrun' ? this.getRank(ratings) : null;
             const rankIcon = rank ? `<img src="${this.getRankIcon(rank)}" class="rank-badge" alt="${rank} rank">` : '';
             const profile = this.profiles.get(l.creator) || { avatar: 'thumbs/default-avatar.png' };
             return `
@@ -271,17 +271,6 @@ class URLSApp {
                 </div>
                 <p><strong>Created:</strong> ${new Date(lvl.created).toLocaleDateString()}</p>
 
-                ${type === 'speedrun' ? `
-                <div style="text-align:center;margin:1.5rem 0;">
-                    ${rankIcon}
-                    <p style="font-size:1.4rem;font-weight:700;margin-top:.5rem;">
-                        <span style="background:linear-gradient(90deg,#00c6ff,#ff7e5f);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">
-                            ${total}/30
-                        </span>
-                    </p>
-                </div>
-                ` : ''}
-
                 <div class="level-id-bar">
                     <span class="id-label">ID:</span>
                     <input type="text" value="${lvl.id}" readonly>
@@ -297,17 +286,15 @@ class URLSApp {
                     <h3>Ratings</h3>
                     ${type === 'speedrun' ? `
                     <div class="rating-item">
-                        <img src="assets/normalranking.png" alt="Gameplay">
                         <span>Gameplay</span>
                         <span class="rating-value">${lvl.ratings.gameplay}/10</span>
+                        ${rankIcon ? rankIcon : ''}
                     </div>
                     <div class="rating-item">
-                        <img src="assets/normalranking.png" alt="Design">
                         <span>Design</span>
                         <span class="rating-value">${lvl.ratings.design}/10</span>
                     </div>
                     <div class="rating-item">
-                        <img src="assets/normalranking.png" alt="Speedrunning">
                         <span>Speedrunning</span>
                         <span class="rating-value">${lvl.ratings.speedrunning}/10</span>
                     </div>
@@ -325,6 +312,15 @@ class URLSApp {
                         <span class="rating-value">${lvl.ratings.difficulty}/10</span>
                     </div>
                     `}
+                    ${type === 'speedrun' ? `
+                    <div style="text-align:center;margin:1.5rem 0;">
+                        <p style="font-size:1.4rem;font-weight:700;">
+                            <span style="background:linear-gradient(90deg,#00c6ff,#ff7e5f);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">
+                                ${total}/30
+                            </span>
+                        </p>
+                    </div>
+                    ` : ''}
                 </div>
             </div>
         `;
