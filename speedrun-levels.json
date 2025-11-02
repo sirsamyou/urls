@@ -1,0 +1,15 @@
+[
+    {
+        "id": 1744991293007,
+        "name": "Mario Circuit 1",
+        "creator": "Coochie",
+        "thumbnail": "thumbs/mario-circuit-1.jpg",
+        "created": "2025-04-20",
+        "link": "https://narrowarrow.xyz/levelid=1744991293007",
+        "type": "speedrun",
+        "ratings": {
+            "gameplay": 7.3,
+            "design": 7.5
+        }
+    }
+]
