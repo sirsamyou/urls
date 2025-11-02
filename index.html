@@ -10,13 +10,14 @@
 <body>
     <header>
         <div class="container header-container">
-            <h1 class="logo">URLS</h1>
+            <h1 class="logo" id="urls-logo">URLS</h1>
             <button class="hamburger"><i class="fas fa-bars"></i></button>
             <nav class="nav">
                 <ul>
                     <li><a href="#" data-page="speedrun">Speedrun</a></li>
                     <li><a href="#" data-page="hard">Hard</a></li>
                     <li><a href="#" data-page="leaderboard">Leaderboard</a></li>
+                    <li><a href="#" data-page="faq">FAQ</a></li>
                 </ul>
             </nav>
             <a href="https://discord.gg/7RseZpdxdU" class="discord-btn" target="_blank" title="Join Discord">
@@ -54,6 +55,12 @@
         <section id="leaderboard" class="page">
             <h2>Leaderboard</h2>
             <div id="leaderboard-list" class="leaderboard-grid"></div>
+        </section>
+
+        <!-- FAQ Page -->
+        <section id="faq" class="page">
+            <button class="back-btn"><i class="fas fa-arrow-left"></i> Back</button>
+            <div id="faq-content" class="fade-in"></div>
         </section>
 
         <!-- Level Page -->
