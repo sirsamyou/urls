@@ -214,16 +214,16 @@ class URLSApp {
                         <strong>sqm</strong><span>Designer</span>
                     </div>
                     <div class="team-member">
+                        <img src="${this.profiles.get('Ripted')?.avatar || 'thumbs/default-avatar.png'}" alt="Ripted">
+                        <strong>Ripted</strong><span>Rater & Designer</span>
+                    </div>
+                    <div class="team-member">
                         <img src="${this.profiles.get('Ch4mpY')?.avatar || 'thumbs/default-avatar.png'}" alt="Ch4mpY">
                         <strong>Ch4mpY</strong><span>Rater</span>
                     </div>
                     <div class="team-member">
                         <img src="${this.profiles.get('Polar')?.avatar || 'thumbs/default-avatar.png'}" alt="Polar">
                         <strong>Polar</strong><span>Rater</span>
-                    </div>
-                    <div class="team-member">
-                        <img src="${this.profiles.get('Ripted')?.avatar || 'thumbs/default-avatar.png'}" alt="Ripted">
-                        <strong>Ripted</strong><span>Rater</span>
                     </div>
                 </div>
             </div>
