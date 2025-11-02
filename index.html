@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>URLS - Unofficial Rating Levels System</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1 class="logo">URLS</h1>
+            <nav class="nav">
+                <ul>
+                    <li><a href="#" data-page="speedrun">Speedrun Levels</a></li>
+                    <li><a href="#" data-page="hard">Hard Levels</a></li>
+                    <li><a href="#" data-page="leaderboard">Leaderboard</a></li>
+                </ul>
+            </nav>
+            <a href="https://discord.gg/7RseZpdxdU" class="discord-btn" target="_blank">Join Discord</a>
+        </div>
+    </header>
+
+    <main class="container">
+        <!-- Speedrun Levels -->
+        <section id="speedrun" class="page active">
+            <h2>Speedrun Levels</h2>
+            <div class="controls">
+                <input type="text" id="speedrun-search" placeholder="Search levels...">
+                <select id="speedrun-sort">
+                    <option value="recent">Most Recent</option>
+                    <option value="rated">Best Rated</option>
+                </select>
+            </div>
+            <div id="speedrun-list" class="levels-grid"></div>
+        </section>
+
+        <!-- Hard Levels -->
+        <section id="hard" class="page">
+            <h2>Hard Levels</h2>
+            <div class="controls">
+                <input type="text" id="hard-search" placeholder="Search levels...">
+                <select id="hard-sort">
+                    <option value="recent">Most Recent</option>
+                    <option value="rated">Best Rated</option>
+                </select>
+            </div>
+            <div id="hard-list" class="levels-grid"></div>
+        </section>
+
+        <!-- Leaderboard -->
+        <section id="leaderboard" class="page">
+            <h2>Leaderboard</h2>
+            <div id="leaderboard-list" class="leaderboard-grid"></div>
+        </section>
+
+        <!-- Level Detail Modal -->
+        <div id="level-modal" class="modal">
+            <div class="modal-content">
+                <span class="close">×</span>
+                <div id="level-detail"></div>
+            </div>
+        </div>
+
+        <!-- Creator Profile Modal -->
+        <div id="creator-modal" class="modal">
+            <div class="modal-content">
+                <span class="close">×</span>
+                <div id="creator-detail"></div>
+            </div>
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>
