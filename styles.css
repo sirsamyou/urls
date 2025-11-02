@@ -1,4 +1,4 @@
-/* ----------  RESET & BASE ---------- */
+/* ---------- RESET & BASE ---------- */
 *{margin:0;padding:0;box-sizing:border-box;}
 html{scroll-behavior:smooth;}
 body{
@@ -8,10 +8,10 @@ body{
     line-height:1.6;
 }
 
-/* ----------  LAYOUT ---------- */
+/* ---------- LAYOUT ---------- */
 .container{max-width:1240px;margin:auto;padding:0 1rem;}
 
-/* ----------  HEADER ---------- */
+/* ---------- HEADER ---------- */
 header{
     background:#16161d;
     border-bottom:1px solid #2a2a33;
@@ -27,30 +27,22 @@ header .container{
     -webkit-background-clip:text;
     -webkit-text-fill-color:transparent;
 }
-.nav ul{
-    display:flex;gap:2rem;list-style:none;
-}
+.nav ul{display:flex;gap:2rem;list-style:none;}
 .nav a{
     color:#b0b0b0;text-decoration:none;font-weight:500;
-    transition:all .3s ease;
-    position:relative;
+    transition:all .3s;position:relative;
 }
-.nav a:hover,.nav a.active{
-    color:#00c6ff;
-}
+.nav a:hover,.nav a.active{color:#00c6ff;}
 .nav a::after{
     content:'';position:absolute;bottom:-6px;left:0;width:0;height:2px;
-    background:#00c6ff;transition:width .3s ease;
+    background:#00c6ff;transition:width .3s;
 }
 .nav a:hover::after,.nav a.active::after{width:100%;}
 
-/* Discord icon button */
-.discord-btn{
-    font-size:1.6rem;color:#7289da;transition:transform .2s,color .3s;
-}
+.discord-btn{font-size:1.6rem;color:#7289da;transition:transform .2s,color .3s;}
 .discord-btn:hover{transform:scale(1.2);color:#99aab5;}
 
-/* ----------  PAGES ---------- */
+/* ---------- PAGES ---------- */
 .page{display:none;padding:2rem 0;}
 .page.active{display:block;}
 h2{
@@ -60,7 +52,15 @@ h2{
     -webkit-text-fill-color:transparent;
 }
 
-/* ----------  FILTER BAR ---------- */
+/* Back button */
+.back-btn{
+    background:none;border:none;color:#aaa;font-size:1.1rem;
+    display:flex;align-items:center;gap:.4rem;cursor:pointer;
+    margin-bottom:1rem;transition:color .2s;
+}
+.back-btn:hover{color:#00c6ff;}
+
+/* ---------- FILTER BAR ---------- */
 .filter-bar{
     display:flex;gap:.8rem;align-items:center;margin-bottom:1.5rem;flex-wrap:wrap;
 }
@@ -72,14 +72,12 @@ h2{
 .filter-bar input:focus{
     border-color:#00c6ff;outline:none;box-shadow:0 0 0 2px rgba(0,198,255,.2);
 }
-.sort-btns{
-    display:flex;gap:.4rem;
-}
+.sort-btns{display:flex;gap:.4rem;}
 .sort-btn{
     background:#1e1e28;border:none;color:#aaa;
     padding:.45rem .9rem;border-radius:6px;
     font-size:.9rem;display:flex;align-items:center;gap:.4rem;
-    cursor:pointer;transition:all .25s ease;
+    cursor:pointer;transition:all .25s;
 }
 .sort-btn i{font-size:1rem;}
 .sort-btn:hover{background:#2a2a33;color:#e0e0e0;}
@@ -87,7 +85,7 @@ h2{
     background:#00c6ff;color:#fff;box-shadow:0 0 8px rgba(0,198,255,.4);
 }
 
-/* ----------  LEVELS GRID ---------- */
+/* ---------- LEVELS GRID ---------- */
 .levels-grid{
     display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1.5rem;
 }
@@ -111,18 +109,68 @@ h2{
     font-size:1.15rem;margin-bottom:.4rem;color:#fff;
     white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
 }
-.level-info p{
-    font-size:.9rem;color:#aaa;margin:.2rem 0;
-}
-.rating{
-    font-weight:600;color:#00c6ff;
-}
-.creator-link{
-    color:#00c6ff;text-decoration:none;transition:color .2s;
-}
+.level-info p{font-size:.9rem;color:#aaa;margin:.2rem 0;}
+.rating{font-weight:600;color:#00c6ff;}
+.creator-link{color:#00c6ff;text-decoration:none;transition:color .2s;}
 .creator-link:hover{color:#ff7e5f;}
 
-/* ----------  LEADERBOARD ---------- */
+/* ---------- LEVEL DETAIL PAGE ---------- */
+#level-detail-content{
+    max-width:800px;margin:auto;background:#1a1a22;
+    border-radius:14px;padding:2rem;box-shadow:0 12px 30px rgba(0,0,0,.4);
+}
+.level-detail-img{
+    width:100%;height:300px;object-fit:cover;border-radius:10px;
+    margin-bottom:1.5rem;
+}
+.level-detail-info h1{
+    font-size:2rem;margin-bottom:.5rem;color:#fff;
+}
+.level-detail-info p{
+    margin:.5rem 0;font-size:1rem;color:#ccc;
+}
+.level-id-bar{
+    display:flex;gap:.8rem;align-items:center;margin:1rem 0;
+    padding:.8rem;background:#22222b;border-radius:8px;
+}
+.level-id-bar input{
+    flex:1;background:none;border:none;color:#e0e0e0;font-family:monospace;
+}
+.copy-btn,.play-btn{
+    background:#00c6ff;color:#fff;padding:.5rem 1rem;
+    border:none;border-radius:6px;cursor:pointer;transition:background .2s;
+}
+.copy-btn:hover,.play-btn:hover{background:#00a3cc;}
+.play-btn i{margin-right:.4rem;}
+
+/* ---------- CREATOR PROFILE PAGE ---------- */
+#creator-profile-content{
+    max-width:900px;margin:auto;
+}
+.profile-banner{
+    height:200px;width:100%;object-fit:cover;border-radius:12px;
+    margin-bottom:-60px;box-shadow:0 8px 20px rgba(0,0,0,.5);
+}
+.profile-header{
+    display:flex;gap:2rem;align-items:flex-end;padding:1.5rem 2rem;
+    background:#1a1a22;border-radius:12px;
+    box-shadow:0 6px 20px rgba(0,0,0,.3);
+    position:relative;z-index:1;
+}
+.profile-pic{
+    width:120px;height:120px;border-radius:50%;
+    object-fit:cover;border:5px solid #0e0e12;
+    box-shadow:0 0 20px rgba(0,198,255,.5);
+}
+.profile-info h1{
+    font-size:2rem;margin-bottom:.3rem;
+}
+.profile-stats{
+    display:flex;gap:1.5rem;font-size:.95rem;color:#aaa;
+}
+.profile-stat strong{color:#00c6ff;}
+
+/* ---------- LEADERBOARD ---------- */
 .leaderboard-grid{
     display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:1rem;
 }
@@ -140,29 +188,7 @@ h2{
     -webkit-text-fill-color:transparent;
 }
 
-/* ----------  MODALS ---------- */
-.modal{
-    display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);
-    align-items:center;justify-content:center;z-index:1000;
-    animation:fadeIn .3s ease;
-}
-.modal-content{
-    background:#1a1a22;max-width:560px;width:90%;max-height:85vh;
-    border-radius:14px;padding:1.8rem;overflow-y:auto;
-    box-shadow:0 15px 40px rgba(0,0,0,.5);
-    animation:slideUp .4s ease;
-}
-.close{
-    float:right;font-size:2rem;color:#777;cursor:pointer;
-    transition:color .2s;
-}
-.close:hover{color:#fff;}
-
-/* ----------  ANIMATIONS ---------- */
-@keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
-@keyframes slideUp{from{transform:translateY(30px);opacity:0;}to{transform:translateY(0);opacity:1;}}
-
-/* ----------  RESPONSIVE ---------- */
+/* ---------- RESPONSIVE ---------- */
 @media(max-width:768px){
     header .container{flex-direction:column;gap:1rem;}
     .nav ul{flex-direction:column;gap:.8rem;text-align:center;}
@@ -170,4 +196,7 @@ h2{
     .filter-bar input{min-width:auto;}
     .sort-btns{justify-content:center;}
     .levels-grid,.leaderboard-grid{grid-template-columns:1fr;}
+    .profile-header{flex-direction:column;text-align:center;align-items:center;}
+    .profile-pic{margin-bottom:1rem;}
+    .level-id-bar{flex-direction:column;gap:.5rem;}
 }
