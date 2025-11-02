@@ -1,4 +1,4 @@
-// script.js 
+// script.js
 class URLSApp {
     constructor() {
         this.speedrunLevels = [];
@@ -67,7 +67,7 @@ class URLSApp {
                 sum = lvl.ratings.speedrun + lvl.ratings.design + lvl.ratings.difficulty;
                 data.hardCount++;
             }
-            data.totalPoints += sum / 10; // Every 10 points = 1 Creator Point
+            data.totalPoints += sum / 10;
         });
         this.creators.forEach(d => {
             d.totalLevels = d.levels.length;
@@ -75,7 +75,6 @@ class URLSApp {
     }
 
     calculateLeaderboard() {
-        // Pre-calculate positions for each type
         const creators = [...this.creators.entries()];
 
         const byPoints = creators.sort(([,a],[,b]) => b.totalPoints - a.totalPoints);
@@ -92,6 +91,12 @@ class URLSApp {
     }
 
     bindEvents() {
+        // URLS logo → FAQ
+        document.getElementById('urls-logo').addEventListener('click', e => {
+            e.preventDefault();
+            this.switchPage('faq');
+        });
+
         // hamburger
         document.querySelector('.hamburger').addEventListener('click', () => {
             document.querySelector('.nav').classList.toggle('active');
@@ -158,7 +163,11 @@ class URLSApp {
 
     renderFAQ() {
         document.getElementById('faq-content').innerHTML = `
-            <h1>URLS Rating System</h1>
+            <h1>URLS – Unofficial Rating Levels System</h1>
+
+            <div class="faq-intro">
+                <p><strong>URLS</strong> is an <strong>Unofficial Rating Levels System</strong> for community-made levels. Our team of raters evaluates submissions based on gameplay, design, and speedrunning potential (or difficulty for hard levels).</p>
+            </div>
 
             <div class="faq-section">
                 <h3><img src="assets/normalranking.png" alt="Normal"> Speedrun Level Rating</h3>
@@ -196,11 +205,34 @@ class URLSApp {
             <div class="faq-section">
                 <h3>Team</h3>
                 <div class="team-grid">
-                    <div class="team-member"><strong>j89de</strong><span>Founder & Rater</span></div>
-                    <div class="team-member"><strong>sqm</strong><span>Designer</span></div>
-                    <div class="team-member"><strong>Ch4mpY</strong><span>Rater</span></div>
-                    <div class="team-member"><strong>Polar</strong><span>Rater</span></div>
-                    <div class="team-member"><strong>Ripted</strong><span>Rater</span></div>
+                    <div class="team-member">
+                        <img src="${this.profiles.get('j89de')?.avatar || 'thumbs/default-avatar.png'}" alt="j89de">
+                        <strong>j89de</strong><span>Founder & Rater</span>
+                    </div>
+                    <div class="team-member">
+                        <img src="${this.profiles.get('sqm')?.avatar || 'thumbs/default-avatar.png'}" alt="sqm">
+                        <strong>sqm</strong><span>Designer</span>
+                    </div>
+                    <div class="team-member">
+                        <img src="${this.profiles.get('Ch4mpY')?.avatar || 'thumbs/default-avatar.png'}" alt="Ch4mpY">
+                        <strong>Ch4mpY</strong><span>Rater</span>
+                    </div>
+                    <div class="team-member">
+                        <img src="${this.profiles.get('Polar')?.avatar || 'thumbs/default-avatar.png'}" alt="Polar">
+                        <strong>Polar</strong><span>Rater</span>
+                    </div>
+                    <div class="team-member">
+                        <img src="${this.profiles.get('Ripted')?.avatar || 'thumbs/default-avatar.png'}" alt="Ripted">
+                        <strong>Ripted</strong><span>Rater</span>
+                    </div>
+                    <div class="team-member">
+                        <img src="${this.profiles.get('Coochie')?.avatar || 'thumbs/default-avatar.png'}" alt="Coochie">
+                        <strong>Coochie</strong><span>Rater</span>
+                    </div>
+                    <div class="team-member">
+                        <img src="${this.profiles.get('Goosey')?.avatar || 'thumbs/default-avatar.png'}" alt="Goosey">
+                        <strong>Goosey</strong><span>Rater</span>
+                    </div>
                 </div>
             </div>
 
@@ -240,8 +272,9 @@ class URLSApp {
                     <div class="level-info">
                         <h3>${l.name}</h3>
                         <div class="creator-info">
+                            <span><strong>Creator:</strong></span>
                             <img src="${profile.avatar}" alt="${l.creator}">
-                            <span><strong>Creator:</strong> <span class="creator-link" data-creator="${l.creator}">${l.creator}</span></span>
+                            <span class="creator-link" data-creator="${l.creator}">${l.creator}</span>
                         </div>
                         <p><strong>Created:</strong> ${new Date(l.created).toLocaleDateString()}</p>
                         <div style="display:flex;align-items:center;gap:.4rem;margin-top:.5rem;">
@@ -286,9 +319,10 @@ class URLSApp {
             <img src="${lvl.thumbnail}" class="level-detail-img" alt="${lvl.name}">
             <div class="level-detail-info">
                 <h1>${lvl.name}</h1>
-                <div class="creator-info" style="margin:1rem 0;">
+                <div class="creator-info" style="margin:1rem 0;display:flex;align-items:center;gap:.5rem;">
+                    <span><strong>Creator:</strong></span>
                     <img src="${profile.avatar}" alt="${lvl.creator}" style="width:32px;height:32px;border-radius:50%;border:2px solid #00c6ff;">
-                    <span><strong>Creator:</strong> <span class="creator-link" data-creator="${lvl.creator}" style="font-size:1.1rem;">${lvl.creator}</span></span>
+                    <span class="creator-link" data-creator="${lvl.creator}" style="font-size:1.1rem;">${lvl.creator}</span>
                 </div>
                 <p><strong>Created:</strong> ${new Date(lvl.created).toLocaleDateString()}</p>
 
