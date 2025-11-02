@@ -14,7 +14,7 @@ class URLSApp {
         await this.loadData();
         await this.loadProfiles();
         this.aggregateCreators();
-        this.calculateLeaderboard();
+        this.calculateLeaderboard(); 
         this.render();
         this.bindEvents();
     }
