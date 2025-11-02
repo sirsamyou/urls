@@ -1,4 +1,4 @@
-// script.js 
+// script.js
 class URLSApp {
     constructor() {
         this.speedrunLevels = [];
@@ -170,7 +170,7 @@ class URLSApp {
             </div>
 
             <div class="faq-section">
-                <h3><img src="assets/normalranking.png" alt="Normal"> Speedrun Level Rating</h3>
+                <h3>Speedrun Level Rating</h3>
                 <p>Speedrun maps are rated on three aspects:</p>
                 <ul>
                     <li><strong>Gameplay:</strong> How fun and fluid the level is to play (0–10)</li>
@@ -180,7 +180,7 @@ class URLSApp {
             </div>
 
             <div class="faq-section">
-                <h3><img src="assets/epicranking.png" alt="Epic"> Rank System</h3>
+                <h3>Rank System</h3>
                 <p>Only levels with <strong>10+ total points</strong> are ranked:</p>
                 <ul>
                     <li><img src="assets/normalranking.png" alt="Normal"> <strong>Normal:</strong> 10 – 17.9 / 30</li>
@@ -191,7 +191,7 @@ class URLSApp {
             </div>
 
             <div class="faq-section">
-                <h3><img src="assets/normalranking.png" alt="Points"> Creator Points</h3>
+                <h3>Creator Points</h3>
                 <p>Every <strong>10 rating points</strong> a level earns = <strong>1 Creator Point</strong>.</p>
                 <p><strong>Example:</strong> A level rated <strong>14/30</strong> gives <strong>1.4 Creator Points</strong>.</p>
                 <p>These points are used in the <strong>Creator Points Leaderboard</strong>.</p>
