@@ -3,13 +3,16 @@ class URLSApp {
     constructor() {
         this.speedrunLevels = [];
         this.hardLevels = [];
-        this.creators = new Map(); // creator → {levels:[], avgRating, totalLevels}
+        this.profiles = new Map(); // name → {avatar, banner}
+        this.creators = new Map();
         this.currentPage = 'speedrun';
+        this.lastListPage = 'speedrun';
         this.init();
     }
 
     async init() {
         await this.loadData();
+        await this.loadProfiles();
         this.aggregateCreators();
         this.calculateLeaderboard();
         this.render();
@@ -23,14 +26,20 @@ class URLSApp {
         } catch (e) { console.error('Load error:', e); }
     }
 
+    async loadProfiles() {
+        try {
+            const data = await fetch('profiles.json').then(r => r.json());
+            data.forEach(p => this.profiles.set(p.name, { avatar: p.avatar, banner: p.banner }));
+        } catch (e) { console.error('Profiles load error:', e); }
+    }
+
     aggregateCreators() {
         const all = [...this.speedrunLevels, ...this.hardLevels];
         all.forEach(lvl => {
             const c = lvl.creator;
-            if (!this.creators.has(c)) this.creators.set(c, {levels: [], total: 0, count: 0});
+            if (!this.creators.has(c)) this.creators.set(c, { levels: [], total: 0, count: 0 });
             const data = this.creators.get(c);
             data.levels.push(lvl);
-
             const sum = lvl.type === 'speedrun'
                 ? lvl.ratings.gameplay + lvl.ratings.design
                 : lvl.ratings.speedrun + lvl.ratings.design + lvl.ratings.difficulty;
@@ -55,42 +64,44 @@ class URLSApp {
             e.preventDefault(); this.switchPage(e.target.dataset.page);
         }));
 
-        // sort buttons (compact)
+        // back buttons
+        document.querySelectorAll('.back-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                this.switchPage(this.lastListPage);
+            });
+        });
+
+        // sort buttons
         document.querySelectorAll('.sort-btn').forEach(btn => {
             btn.addEventListener('click', () => {
                 const type = btn.dataset.type;
                 const sort = btn.dataset.sort;
-
-                // toggle active
                 document.querySelectorAll(`.sort-btn[data-type="${type}"]`).forEach(b => b.classList.remove('active'));
                 btn.classList.add('active');
-
-                // filter
                 const searchEl = document.getElementById(`${type}-search`);
-                this.filterSort(type, searchEl.value, sort);
+                this.filterSort(type, searchEl ? searchEl.value : '', sort);
             });
         });
 
-        // search inputs
+        // search
         ['speedrun', 'hard'].forEach(type => {
-            document.getElementById(`${type}-search`).addEventListener('input', e => {
-                const activeSort = document.querySelector(`.sort-btn[data-type="${type}"].active`).dataset.sort;
-                this.filterSort(type, e.target.value, activeSort);
+            const el = document.getElementById(`${type}-search`);
+            if (el) el.addEventListener('input', e => {
+                const sort = document.querySelector(`.sort-btn[data-type="${type}"].active`).dataset.sort;
+                this.filterSort(type, e.target.value, sort);
             });
         });
-
-        // modal close
-        document.querySelectorAll('.close').forEach(c => c.addEventListener('click', () => this.closeModal()));
-        window.addEventListener('click', e => { if (e.target.classList.contains('modal')) this.closeModal(); });
     }
 
     switchPage(p) {
         document.querySelectorAll('.page').forEach(pg => pg.classList.remove('active'));
         document.getElementById(p).classList.add('active');
         document.querySelectorAll('.nav a').forEach(a => a.classList.remove('active'));
-        document.querySelector(`[data-page="${p}"]`).classList.add('active');
+        const link = document.querySelector(`[data-page="${p}"]`);
+        if (link) link.classList.add('active');
+        if (['speedrun', 'hard', 'leaderboard'].includes(p)) this.lastListPage = p;
         if (p === 'leaderboard') this.renderLeaderboard();
-        else this.renderLevels(p);
+        else if (p === 'speedrun' || p === 'hard') this.renderLevels(p);
         this.currentPage = p;
     }
 
@@ -128,41 +139,54 @@ class URLSApp {
         container.querySelectorAll('.level-card').forEach(card => {
             card.addEventListener('click', e => {
                 if (e.target.classList.contains('creator-link')) return;
-                this.showLevel(card.dataset.type, card.dataset.id);
+                this.showLevelPage(card.dataset.type, card.dataset.id);
             });
         });
         container.querySelectorAll('.creator-link').forEach(l => l.addEventListener('click', e => {
-            e.stopPropagation(); this.showCreator(e.target.dataset.creator);
+            e.stopPropagation(); this.showCreatorPage(e.target.dataset.creator);
         }));
     }
 
-    showLevel(type, id) {
+    showLevelPage(type, id) {
         const list = type === 'speedrun' ? this.speedrunLevels : this.hardLevels;
         const lvl = list.find(l => l.id == id);
         if (!lvl) return;
-        const ratings = Object.entries(lvl.ratings).map(([k, v]) => `<strong>${k.charAt(0).toUpperCase() + k.slice(1)}:</strong> ${v}/10`).join('<br>');
-        document.getElementById('level-detail').innerHTML = `
-            <img src="${lvl.thumbnail}" alt="${lvl.name}">
-            <h2>${lvl.name}</h2>
-            <p><strong>Creator:</strong> <span class="creator-link" data-creator="${lvl.creator}">${lvl.creator}</span></p>
-            <p><strong>ID:</strong> ${lvl.id}</p>
-            <p><strong>Link:</strong> <a href="${lvl.link}" target="_blank">Play Level</a></p>
-            <p><strong>Created:</strong> ${new Date(lvl.created).toLocaleDateString()}</p>
-            <div class="ratings"><h3>Ratings</h3>${ratings}</div>
+
+        const ratings = Object.entries(lvl.ratings).map(([k, v]) => `
+            <p><strong>${k.charAt(0).toUpperCase() + k.slice(1)}:</strong> ${v}/10</p>
+        `).join('');
+
+        document.getElementById('level-detail-content').innerHTML = `
+            <img src="${lvl.thumbnail}" class="level-detail-img" alt="${lvl.name}">
+            <div class="level-detail-info">
+                <h1>${lvl.name}</h1>
+                <p><strong>Creator:</strong> <span class="creator-link" data-creator="${lvl.creator}">${lvl.creator}</span></p>
+                <p><strong>Created:</strong> ${new Date(lvl.created).toLocaleDateString()}</p>
+                <div class="level-id-bar">
+                    <input type="text" value="${lvl.id}" readonly>
+                    <button class="copy-btn" onclick="navigator.clipboard.writeText('${lvl.id}').then(() => alert('ID copied!'))"><i class="fas fa-copy"></i> Copy</button>
+                    <a href="${lvl.link}" target="_blank" class="play-btn"><i class="fas fa-play"></i> Play</a>
+                </div>
+                <div class="ratings"><h3>Ratings</h3>${ratings}</div>
+            </div>
         `;
-        document.querySelector('#level-modal .creator-link').addEventListener('click', e => {
-            this.closeModal(); this.showCreator(e.target.dataset.creator);
+
+        document.querySelector('#level-detail-content .creator-link').addEventListener('click', e => {
+            this.showCreatorPage(e.target.dataset.creator);
         });
-        document.getElementById('level-modal').style.display = 'flex';
+
+        this.switchPage('level-detail-page');
     }
 
-    showCreator(name) {
+    showCreatorPage(name) {
         const data = this.creators.get(name);
+        const profile = this.profiles.get(name) || { avatar: 'thumbs/default-avatar.png', banner: 'thumbs/default-banner.jpg' };
         if (!data) return;
+
         let levels = [...data.levels];
         levels.sort((a, b) => new Date(b.created) - new Date(a.created));
 
-        const render = (search = '', sort = 'recent') => {
+        const renderLevels = (search = '', sort = 'recent') => {
             let filtered = levels.filter(l => l.name.toLowerCase().includes(search.toLowerCase()));
             if (sort === 'rated') {
                 filtered.sort((a, b) => {
@@ -173,7 +197,7 @@ class URLSApp {
             } else {
                 filtered.sort((a, b) => new Date(b.created) - new Date(a.created));
             }
-            const grid = document.querySelector('#creator-detail .levels-grid');
+            const grid = document.querySelector('#creator-profile-content .levels-grid');
             grid.innerHTML = filtered.map(l => `
                 <div class="level-card" data-id="${l.id}" data-type="${l.type}">
                     <img src="${l.thumbnail}" alt="${l.name}">
@@ -186,15 +210,23 @@ class URLSApp {
                 </div>
             `).join('');
             grid.querySelectorAll('.level-card').forEach(c => c.addEventListener('click', () => {
-                this.closeModal(); this.showLevel(c.dataset.type, c.dataset.id);
+                this.showLevelPage(c.dataset.type, c.dataset.id);
             }));
         };
 
-        document.getElementById('creator-detail').innerHTML = `
-            <h2>${name}</h2>
-            <p><strong>Total Levels:</strong> ${data.totalLevels}</p>
-            <p><strong>Leaderboard Position:</strong> #${data.position}</p>
-            <p><strong>Avg Rating:</strong> ${data.avgRating.toFixed(1)}/10</p>
+        document.getElementById('creator-profile-content').innerHTML = `
+            <img src="${profile.banner}" class="profile-banner" alt="${name}'s banner">
+            <div class="profile-header">
+                <img src="${profile.avatar}" class="profile-pic" alt="${name}">
+                <div class="profile-info">
+                    <h1>${name}</h1>
+                    <div class="profile-stats">
+                        <div class="profile-stat"><strong>${data.totalLevels}</strong> Levels</div>
+                        <div class="profile-stat"><strong>#${data.position}</strong> Leaderboard</div>
+                        <div class="profile-stat"><strong>${data.avgRating.toFixed(1)}/10</strong> Avg Rating</div>
+                    </div>
+                </div>
+            </div>
             <div class="creator-levels">
                 <h3>Levels</h3>
                 <div class="filter-bar">
@@ -208,23 +240,20 @@ class URLSApp {
             </div>
         `;
 
-        const s = document.getElementById('creator-search');
-        const btns = document.querySelectorAll('#creator-detail .sort-btn');
+        const search = document.getElementById('creator-search');
+        const btns = document.querySelectorAll('#creator-profile-content .sort-btn');
         btns.forEach(b => b.addEventListener('click', () => {
             btns.forEach(bb => bb.classList.remove('active'));
             b.classList.add('active');
-            render(s.value, b.dataset.sort);
+            renderLevels(search.value, b.dataset.sort);
         }));
-        s.addEventListener('input', () => {
-            const active = document.querySelector('#creator-detail .sort-btn.active').dataset.sort;
-            render(s.value, active);
+        search.addEventListener('input', () => {
+            const sort = document.querySelector('#creator-profile-content .sort-btn.active').dataset.sort;
+            renderLevels(search.value, sort);
         });
-        render();
-        document.getElementById('creator-modal').style.display = 'flex';
-    }
+        renderLevels();
 
-    closeModal() {
-        document.querySelectorAll('.modal').forEach(m => m.style.display = 'none');
+        this.switchPage('creator-profile-page');
     }
 
     renderLeaderboard() {
@@ -240,7 +269,7 @@ class URLSApp {
             </div>
         `).join('');
         container.querySelectorAll('.creator-link').forEach(l => l.addEventListener('click', e => {
-            e.preventDefault(); this.showCreator(e.target.dataset.creator);
+            e.preventDefault(); this.showCreatorPage(e.target.dataset.creator);
         }));
     }
 
