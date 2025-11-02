@@ -225,14 +225,6 @@ class URLSApp {
                         <img src="${this.profiles.get('Ripted')?.avatar || 'thumbs/default-avatar.png'}" alt="Ripted">
                         <strong>Ripted</strong><span>Rater</span>
                     </div>
-                    <div class="team-member">
-                        <img src="${this.profiles.get('Coochie')?.avatar || 'thumbs/default-avatar.png'}" alt="Coochie">
-                        <strong>Coochie</strong><span>Rater</span>
-                    </div>
-                    <div class="team-member">
-                        <img src="${this.profiles.get('Goosey')?.avatar || 'thumbs/default-avatar.png'}" alt="Goosey">
-                        <strong>Goosey</strong><span>Rater</span>
-                    </div>
                 </div>
             </div>
 
