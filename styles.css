@@ -26,6 +26,7 @@ header{
     background:linear-gradient(135deg,#00c6ff,#0070f3);
     -webkit-background-clip:text;
     -webkit-text-fill-color:transparent;
+    cursor:pointer;
 }
 .hamburger{
     display:none;background:none;border:none;color:#aaa;font-size:1.6rem;cursor:pointer;
@@ -126,12 +127,9 @@ h2{
     width:24px;height:24px;border-radius:50%;object-fit:cover;
     border:2px solid #00c6ff;
 }
-.rating{
-    font-weight:600;
-    background:linear-gradient(90deg,#ff5e5e,#ffcc00,#5eff5e);
-    -webkit-background-clip:text;
-    -webkit-text-fill-color:transparent;
-    font-size:1rem;
+.rank-badge{
+    width:28px;height:28px;object-fit:contain;
+    filter:drop-shadow(0 0 6px rgba(0,198,255,.5));
 }
 
 /* ---------- LEVEL DETAIL PAGE ---------- */
@@ -171,6 +169,49 @@ h2{
 }
 .copy-btn:hover,.play-btn:hover{background:#00a3cc;transform:scale(1.05);}
 .play-btn{text-decoration:none;}
+
+/* Rating items */
+.rating-item{
+    display:flex;align-items:center;gap:1rem;margin:.8rem 0;
+    padding:.8rem;background:#22222b;border-radius:10px;
+    border-left:4px solid #00c6ff;
+}
+.rating-item img{
+    width:40px;height:40px;object-fit:contain;
+}
+.rating-value{
+    font-size:1.3rem;font-weight:700;
+    background:linear-gradient(90deg,#00c6ff,#ff7e5f);
+    -webkit-background-clip:text;
+    -webkit-text-fill-color:transparent;
+}
+
+/* ---------- FAQ PAGE ---------- */
+#faq-content{
+    max-width:800px;margin:auto;
+    background:#1a1a22;padding:2rem;border-radius:16px;
+    box-shadow:0 12px 30px rgba(0,0,0,.4);
+    border:1px solid #2a2a33;
+}
+#faq-content h1{
+    font-size:2.3rem;margin-bottom:1rem;
+    background:linear-gradient(135deg,#00c6ff,#ff7e5f);
+    -webkit-background-clip:text;
+    -webkit-text-fill-color:transparent;
+}
+#faq-content h3{
+    margin:1.5rem 0 .8rem;
+    color:#00c6ff;
+}
+#faq-content p{
+    margin-bottom:1rem;line-height:1.7;
+}
+#faq-content ul{
+    margin:1rem 0 1.5rem 1.5rem;
+}
+#faq-content li{
+    margin:.5rem 0;
+}
 
 /* ---------- CREATOR PROFILE PAGE ---------- */
 #creator-profile-content{
