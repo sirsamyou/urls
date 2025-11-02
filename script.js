@@ -1,4 +1,4 @@
-// script.js
+// script.js 
 class URLSApp {
     constructor() {
         this.speedrunLevels = [];
