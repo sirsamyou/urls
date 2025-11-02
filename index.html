@@ -9,12 +9,13 @@
 </head>
 <body>
     <header>
-        <div class="container">
+        <div class="container header-container">
             <h1 class="logo">URLS</h1>
+            <button class="hamburger"><i class="fas fa-bars"></i></button>
             <nav class="nav">
                 <ul>
-                    <li><a href="#" data-page="speedrun">Speedrun Levels</a></li>
-                    <li><a href="#" data-page="hard">Hard Levels</a></li>
+                    <li><a href="#" data-page="speedrun">Speedrun</a></li>
+                    <li><a href="#" data-page="hard">Hard</a></li>
                     <li><a href="#" data-page="leaderboard">Leaderboard</a></li>
                 </ul>
             </nav>
@@ -58,13 +59,13 @@
         <!-- Level Page -->
         <section id="level-detail-page" class="page">
             <button class="back-btn"><i class="fas fa-arrow-left"></i> Back</button>
-            <div id="level-detail-content"></div>
+            <div id="level-detail-content" class="fade-in"></div>
         </section>
 
         <!-- Creator Page -->
         <section id="creator-profile-page" class="page">
             <button class="back-btn"><i class="fas fa-arrow-left"></i> Back</button>
-            <div id="creator-profile-content"></div>
+            <div id="creator-profile-content" class="fade-in"></div>
         </section>
     </main>
 
