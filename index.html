@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>URLS - Unofficial Rating Levels System</title>
+    <title>URLS – Unofficial Rating Levels System</title>
     <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
 <body>
     <header>
@@ -17,7 +18,9 @@
                     <li><a href="#" data-page="leaderboard">Leaderboard</a></li>
                 </ul>
             </nav>
-            <a href="https://discord.gg/7RseZpdxdU" class="discord-btn" target="_blank">Join Discord</a>
+            <a href="https://discord.gg/7RseZpdxdU" class="discord-btn" target="_blank" title="Join Discord">
+                <i class="fab fa-discord"></i>
+            </a>
         </div>
     </header>
 
@@ -25,12 +28,12 @@
         <!-- Speedrun Levels -->
         <section id="speedrun" class="page active">
             <h2>Speedrun Levels</h2>
-            <div class="controls">
-                <input type="text" id="speedrun-search" placeholder="Search levels...">
-                <select id="speedrun-sort">
-                    <option value="recent">Most Recent</option>
-                    <option value="rated">Best Rated</option>
-                </select>
+            <div class="filter-bar">
+                <input type="text" id="speedrun-search" placeholder="Search…">
+                <div class="sort-btns">
+                    <button data-type="speedrun" data-sort="recent" class="sort-btn active"><i class="fas fa-clock"></i> Recent</button>
+                    <button data-type="speedrun" data-sort="rated" class="sort-btn"><i class="fas fa-star"></i> Rating</button>
+                </div>
             </div>
             <div id="speedrun-list" class="levels-grid"></div>
         </section>
@@ -38,12 +41,12 @@
         <!-- Hard Levels -->
         <section id="hard" class="page">
             <h2>Hard Levels</h2>
-            <div class="controls">
-                <input type="text" id="hard-search" placeholder="Search levels...">
-                <select id="hard-sort">
-                    <option value="recent">Most Recent</option>
-                    <option value="rated">Best Rated</option>
-                </select>
+            <div class="filter-bar">
+                <input type="text" id="hard-search" placeholder="Search…">
+                <div class="sort-btns">
+                    <button data-type="hard" data-sort="recent" class="sort-btn active"><i class="fas fa-clock"></i> Recent</button>
+                    <button data-type="hard" data-sort="rated" class="sort-btn"><i class="fas fa-star"></i> Rating</button>
+                </div>
             </div>
             <div id="hard-list" class="levels-grid"></div>
         </section>
@@ -54,18 +57,18 @@
             <div id="leaderboard-list" class="leaderboard-grid"></div>
         </section>
 
-        <!-- Level Detail Modal -->
+        <!-- Level Modal -->
         <div id="level-modal" class="modal">
             <div class="modal-content">
-                <span class="close">×</span>
+                <span class="close">x</span>
                 <div id="level-detail"></div>
             </div>
         </div>
 
-        <!-- Creator Profile Modal -->
+        <!-- Creator Modal -->
         <div id="creator-modal" class="modal">
             <div class="modal-content">
-                <span class="close">×</span>
+                <span class="close">x</span>
                 <div id="creator-detail"></div>
             </div>
         </div>
