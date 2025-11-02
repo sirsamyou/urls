@@ -26,7 +26,6 @@ header{
     background:linear-gradient(135deg,#00c6ff,#0070f3);
     -webkit-background-clip:text;
     -webkit-text-fill-color:transparent;
-    cursor:pointer;
 }
 .hamburger{
     display:none;background:none;border:none;color:#aaa;font-size:1.6rem;cursor:pointer;
@@ -128,7 +127,7 @@ h2{
     border:2px solid #00c6ff;
 }
 .rank-badge{
-    width:20px;height:20px;object-fit:contain;
+    width:24px;height:24px;object-fit:contain;
     filter:drop-shadow(0 0 4px rgba(0,198,255,.5));
 }
 
@@ -186,6 +185,21 @@ h2{
     -webkit-text-fill-color:transparent;
 }
 
+/* Total Score with Icon */
+.total-score{
+    display:flex;align-items:center;justify-content:center;gap:.8rem;
+    margin:1.5rem 0;
+}
+.total-score img{
+    width:40px;height:40px;
+}
+.total-score span{
+    font-size:1.6rem;font-weight:700;
+    background:linear-gradient(90deg,#00c6ff,#ff7e5f);
+    -webkit-background-clip:text;
+    -webkit-text-fill-color:transparent;
+}
+
 /* ---------- SUBMIT PAGE ---------- */
 .submit-form-container{
     background:#1a1a22;border-radius:14px;
@@ -196,25 +210,12 @@ h2{
     border:none;border-radius:10px;
 }
 
-/* ---------- FAQ MODAL ---------- */
-.modal{
-    display:none;position:fixed;z-index:1000;left:0;top:0;width:100%;height:100%;
-    background:rgba(0,0,0,.85);overflow:auto;
+/* ---------- FAQ PAGE ---------- */
+#faq-content{
+    max-width:900px;margin:auto;
 }
-.modal.active{display:block;}
-.modal-content{
-    background:#1a1a22;margin:5% auto;padding:2rem;width:90%;max-width:900px;
-    border-radius:16px;box-shadow:0 15px 40px rgba(0,0,0,.6);
-    border:1px solid #2a2a33;position:relative;
-    animation:modalFadeIn .4s ease-out;
-}
-.close-modal{
-    position:absolute;top:1rem;right:1.5rem;color:#aaa;font-size:2rem;
-    cursor:pointer;transition:color .2s;
-}
-.close-modal:hover{color:#00c6ff;}
 #faq-content h1{
-    font-size:2.4rem;margin-bottom:1.2rem;
+    font-size:2.4rem;margin-bottom:1.5rem;
     background:linear-gradient(135deg,#00c6ff,#ff7e5f);
     -webkit-background-clip:text;
     -webkit-text-fill-color:transparent;
@@ -237,6 +238,9 @@ h2{
 }
 .faq-section li{
     margin:.6rem 0;line-height:1.6;
+}
+.faq-section li img{
+    width:24px;height:24px;vertical-align:middle;margin-right:.4rem;
 }
 .team-grid{
     display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:1rem;
@@ -337,10 +341,6 @@ h2{
     from{opacity:0;transform:translateY(30px);}
     to{opacity:1;transform:translateY(0);}
 }
-@keyframes modalFadeIn{
-    from{opacity:0;transform:scale(.9);}
-    to{opacity:1;transform:scale(1);}
-}
 
 /* ---------- MOBILE ---------- */
 @media(max-width:768px){
@@ -353,7 +353,7 @@ h2{
     .nav.active{right:0;}
     .nav ul{flex-direction:column;gap:2rem;margin-top:4rem;}
     .nav a{font-size:1.2rem;}
-    .header-container{justify-content:space-between;}
+    भी .header-container{justify-content:space-between;}
     .filter-bar{flex-direction:column;align-items:stretch;}
     .filter-bar input{min-width:auto;}
     .sort-btns{justify-content:center;}
