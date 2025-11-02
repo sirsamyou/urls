@@ -59,9 +59,15 @@ class URLSApp {
     }
 
     bindEvents() {
+        // hamburger menu
+        document.querySelector('.hamburger').addEventListener('click', () => {
+            document.querySelector('.nav').classList.toggle('active');
+        });
+
         // navigation
         document.querySelectorAll('.nav a').forEach(a => a.addEventListener('click', e => {
             e.preventDefault(); this.switchPage(e.target.dataset.page);
+            document.querySelector('.nav').classList.remove('active');
         }));
 
         // back buttons
@@ -95,7 +101,8 @@ class URLSApp {
 
     switchPage(p) {
         document.querySelectorAll('.page').forEach(pg => pg.classList.remove('active'));
-        document.getElementById(p).classList.add('active');
+        const target = document.getElementById(p);
+        target.classList.add('active');
         document.querySelectorAll('.nav a').forEach(a => a.classList.remove('active'));
         const link = document.querySelector(`[data-page="${p}"]`);
         if (link) link.classList.add('active');
@@ -103,6 +110,14 @@ class URLSApp {
         if (p === 'leaderboard') this.renderLeaderboard();
         else if (p === 'speedrun' || p === 'hard') this.renderLevels(p);
         this.currentPage = p;
+    }
+
+    getRatingGradient(rating) {
+        if (rating < 3) return 'linear-gradient(90deg, #666, #888)';
+        if (rating < 5) return 'linear-gradient(90deg, #ff5e5e, #ff8c5e)';
+        if (rating < 7) return 'linear-gradient(90deg, #ffcc00, #ffeb3b)';
+        if (rating < 8.5) return 'linear-gradient(90deg, #5eff5e, #8cff5e)';
+        return 'linear-gradient(90deg, #00c6ff, #0099cc)';
     }
 
     filterSort(type, search, sort) {
@@ -124,17 +139,26 @@ class URLSApp {
 
     renderList(type, levels) {
         const container = document.getElementById(type === 'speedrun' ? 'speedrun-list' : 'hard-list');
-        container.innerHTML = levels.map(l => `
-            <div class="level-card" data-id="${l.id}" data-type="${type}">
-                <img src="${l.thumbnail}" alt="${l.name}">
-                <div class="level-info">
-                    <h3>${l.name}</h3>
-                    <p><strong>Creator:</strong> <span class="creator-link" data-creator="${l.creator}">${l.creator}</span></p>
-                    <p><strong>Created:</strong> ${new Date(l.created).toLocaleDateString()}</p>
-                    <p class="rating">Avg: ${(Object.values(l.ratings).reduce((s, v) => s + v, 0) / Object.keys(l.ratings).length).toFixed(1)}/10</p>
+        container.innerHTML = levels.map(l => {
+            const avg = (Object.values(l.ratings).reduce((s, v) => s + v, 0) / Object.keys(l.ratings).length).toFixed(1);
+            const profile = this.profiles.get(l.creator) || { avatar: 'thumbs/default-avatar.png' };
+            return `
+                <div class="level-card" data-id="${l.id}" data-type="${type}">
+                    <img src="${l.thumbnail}" alt="${l.name}">
+                    <div class="level-info">
+                        <h3>${l.name}</h3>
+                        <div class="creator-info">
+                            <img src="${profile.avatar}" alt="${l.creator}">
+                            <span class="creator-link" data-creator="${l.creator}">${l.creator}</span>
+                        </div>
+                        <p><strong>Created:</strong> ${new Date(l.created).toLocaleDateString()}</p>
+                        <p class="rating" style="background:${this.getRatingGradient(avg)};-webkit-background-clip:text;">
+                            ${avg}/10
+                        </p>
+                    </div>
                 </div>
-            </div>
-        `).join('');
+            `;
+        }).join('');
 
         container.querySelectorAll('.level-card').forEach(card => {
             card.addEventListener('click', e => {
@@ -155,17 +179,26 @@ class URLSApp {
         const ratings = Object.entries(lvl.ratings).map(([k, v]) => `
             <p><strong>${k.charAt(0).toUpperCase() + k.slice(1)}:</strong> ${v}/10</p>
         `).join('');
+        const profile = this.profiles.get(lvl.creator) || { avatar: 'thumbs/default-avatar.png' };
 
         document.getElementById('level-detail-content').innerHTML = `
             <img src="${lvl.thumbnail}" class="level-detail-img" alt="${lvl.name}">
             <div class="level-detail-info">
                 <h1>${lvl.name}</h1>
-                <p><strong>Creator:</strong> <span class="creator-link" data-creator="${lvl.creator}">${lvl.creator}</span></p>
+                <div class="creator-info" style="margin:1rem 0;">
+                    <img src="${profile.avatar}" alt="${lvl.creator}" style="width:32px;height:32px;border-radius:50%;border:2px solid #00c6ff;">
+                    <span class="creator-link" data-creator="${lvl.creator}" style="font-size:1.1rem;">${lvl.creator}</span>
+                </div>
                 <p><strong>Created:</strong> ${new Date(lvl.created).toLocaleDateString()}</p>
                 <div class="level-id-bar">
+                    <span class="id-label">ID:</span>
                     <input type="text" value="${lvl.id}" readonly>
-                    <button class="copy-btn" onclick="navigator.clipboard.writeText('${lvl.id}').then(() => alert('ID copied!'))"><i class="fas fa-copy"></i> Copy</button>
-                    <a href="${lvl.link}" target="_blank" class="play-btn"><i class="fas fa-play"></i> Play</a>
+                    <button class="copy-btn" onclick="navigator.clipboard.writeText('${lvl.id}').then(() => alert('ID copied!'))">
+                        <i class="fas fa-copy"></i> Copy
+                    </button>
+                    <a href="${lvl.link}" target="_blank" class="play-btn">
+                        <i class="fas fa-play"></i> Play
+                    </a>
                 </div>
                 <div class="ratings"><h3>Ratings</h3>${ratings}</div>
             </div>
@@ -198,17 +231,22 @@ class URLSApp {
                 filtered.sort((a, b) => new Date(b.created) - new Date(a.created));
             }
             const grid = document.querySelector('#creator-profile-content .levels-grid');
-            grid.innerHTML = filtered.map(l => `
-                <div class="level-card" data-id="${l.id}" data-type="${l.type}">
-                    <img src="${l.thumbnail}" alt="${l.name}">
-                    <div class="level-info">
-                        <h3>${l.name}</h3>
-                        <p><strong>Type:</strong> ${l.type.charAt(0).toUpperCase() + l.type.slice(1)}</p>
-                        <p><strong>Created:</strong> ${new Date(l.created).toLocaleDateString()}</p>
-                        <p class="rating">Avg: ${(Object.values(l.ratings).reduce((s, v) => s + v, 0) / Object.keys(l.ratings).length).toFixed(1)}/10</p>
+            grid.innerHTML = filtered.map(l => {
+                const avg = (Object.values(l.ratings).reduce((s, v) => s + v, 0) / Object.keys(l.ratings).length).toFixed(1);
+                return `
+                    <div class="level-card" data-id="${l.id}" data-type="${l.type}">
+                        <img src="${l.thumbnail}" alt="${l.name}">
+                        <div class="level-info">
+                            <h3>${l.name}</h3>
+                            <p><strong>Type:</strong> ${l.type.charAt(0).toUpperCase() + l.type.slice(1)}</p>
+                            <p><strong>Created:</strong> ${new Date(l.created).toLocaleDateString()}</p>
+                            <p class="rating" style="background:${this.getRatingGradient(avg)};-webkit-background-clip:text;">
+                                ${avg}/10
+                            </p>
+                        </div>
                     </div>
-                </div>
-            `).join('');
+                `;
+            }).join('');
             grid.querySelectorAll('.level-card').forEach(c => c.addEventListener('click', () => {
                 this.showLevelPage(c.dataset.type, c.dataset.id);
             }));
@@ -259,18 +297,29 @@ class URLSApp {
     renderLeaderboard() {
         const sorted = [...this.creators.entries()].sort(([, a], [, b]) => b.avgRating - a.avgRating);
         const container = document.getElementById('leaderboard-list');
-        container.innerHTML = sorted.map(([c, d]) => `
-            <div class="leaderboard-card">
-                <div>
-                    <h3><span class="creator-link" data-creator="${c}">${c}</span></h3>
-                    <p class="avg-rating">Avg: ${d.avgRating.toFixed(1)}/10 | Levels: ${d.totalLevels}</p>
+        container.innerHTML = sorted.map(([c, d]) => {
+            const profile = this.profiles.get(c) || { avatar: 'thumbs/default-avatar.png', banner: 'thumbs/default-banner.jpg' };
+            return `
+                <div class="leaderboard-card" data-creator="${c}">
+                    <img src="${profile.banner}" class="leaderboard-banner" alt="${c}'s banner">
+                    <div class="leaderboard-content">
+                        <div class="leaderboard-info">
+                            <img src="${profile.avatar}" class="leaderboard-avatar" alt="${c}">
+                            <div>
+                                <h3><span class="creator-link" data-creator="${c}">${c}</span></h3>
+                                <p class="avg-rating">Avg: ${d.avgRating.toFixed(1)}/10 | ${d.totalLevels} Levels</p>
+                            </div>
+                        </div>
+                        <span class="position">#${d.position}</span>
+                    </div>
                 </div>
-                <span class="position">#${d.position}</span>
-            </div>
-        `).join('');
-        container.querySelectorAll('.creator-link').forEach(l => l.addEventListener('click', e => {
-            e.preventDefault(); this.showCreatorPage(e.target.dataset.creator);
-        }));
+            `;
+        }).join('');
+        container.querySelectorAll('.leaderboard-card').forEach(card => {
+            card.addEventListener('click', () => {
+                this.showCreatorPage(card.dataset.creator);
+            });
+        });
     }
 
     render() {
