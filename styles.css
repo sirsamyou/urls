@@ -1,4 +1,4 @@
-/* ---------- RESET & BASE ---------- */ 
+/* ---------- RESET & BASE ---------- */
 *{margin:0;padding:0;box-sizing:border-box;}
 html{scroll-behavior:smooth;}
 body{
@@ -11,7 +11,7 @@ body{
 
 /* ---------- LAYOUT ---------- */
 .container{max-width:1240px;margin:auto;padding:0 1rem;}
-.header-container{display:flex;align-items:center;justify-content:space-between;}
+.header-container{display:flex;align-items:center;justify-content:space-between;gap:1rem;}
 
 /* ---------- HEADER ---------- */
 header{
@@ -88,40 +88,87 @@ h2{
     background:#00c6ff;color:#fff;box-shadow:0 0 8px rgba(0,198,255,.4);
 }
 
+/* ---------- RANDOM LEVEL BUTTONS ---------- */
+.random-level-wrapper {
+    display: flex;
+    justify-content: center;
+    margin: 1rem 0 1.5rem;
+}
+
+.random-btn {
+    background: linear-gradient(135deg, #ff7e5f, #00c6ff);
+    border: none;
+    color: white;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    font-size: 1.1rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 12px rgba(0, 198, 255, 0.3);
+    transition: all 0.3s ease;
+    animation: float 3s ease-in-out infinite;
+}
+
+.random-btn:hover {
+    transform: scale(1.15) rotate(20deg);
+    box-shadow: 0 6px 20px rgba(0, 198, 255, 0.5);
+}
+
+.random-btn:active {
+    transform: scale(0.95);
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-6px); }
+}
+
 /* ---------- LEVELS GRID ---------- */
 .levels-grid{
     display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1.5rem;
 }
+
+/* LEVEL CARD: Outline Hover + Scroll Animation */
 .level-card{
     background:#1a1a22;border-radius:12px;overflow:hidden;
     box-shadow:0 4px 15px rgba(0,0,0,.3);
-    transition:transform .3s ease,box-shadow .3s ease;
     cursor:pointer;position:relative;
-    opacity:0;transform:translateY(20px);
-    animation:fadeInUpCard .6s ease-out forwards;
+    border: 2px solid transparent;
+    transition: all 0.4s ease;
+    opacity: 0;
+    transform: translateY(30px);
 }
-.level-card:nth-child(1){animation-delay:.1s;}
-.level-card:nth-child(2){animation-delay:.15s;}
-.level-card:nth-child(3){animation-delay:.2s;}
-.level-card:nth-child(4){animation-delay:.25s;}
-.level-card:nth-child(5){animation-delay:.3s;}
-.level-card:nth-child(6){animation-delay:.35s;}
-.level-card::before{
-    content:'';position:absolute;top:0;left:0;right:0;height:4px;
-    background:linear-gradient(90deg,#ff5e5e,#ffcc00,#5eff5e);
-    border-radius:12px 12px 0 0;
-    opacity:0;transition:opacity .3s;
+
+.level-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    border: 2px solid #00c6ff;
+    border-radius: 12px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
 }
-.level-card:hover::before{opacity:1;}
-.level-card:hover{
-    transform:translateY(-8px);
-    box-shadow:0 12px 25px rgba(0,198,255,.15);
+
+.level-card:hover::before,
+.level-card:focus::before {
+    opacity: 1;
 }
+
+.level-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+}
+
 .level-card img{
     width:100%;height:180px;object-fit:cover;
     transition:transform .4s ease;
 }
 .level-card:hover img{transform:scale(1.05);}
+
 .level-info{padding:1rem;position:relative;}
 .level-info h3{
     font-size:1.15rem;margin-bottom:.4rem;color:#fff;
@@ -145,8 +192,6 @@ h2{
     max-width:800px;margin:auto;background:#1a1a22;
     border-radius:16px;padding:2rem;box-shadow:0 15px 40px rgba(0,0,0,.5);
     border:1px solid #2a2a33;
-    opacity:0;transform:translateY(30px);
-    animation:fadeInUpDetail .7s ease-out forwards;
 }
 .level-detail-img{
     width:100%;height:300px;object-fit:cover;border-radius:12px;
@@ -238,8 +283,6 @@ h2{
 /* ---------- FAQ PAGE ---------- */
 #faq-content{
     max-width:900px;margin:auto;
-    opacity:0;transform:translateY(30px);
-    animation:fadeInUpDetail .7s ease-out forwards;
 }
 #faq-content h1{
     font-size:2.4rem;margin-bottom:1.5rem;
@@ -300,8 +343,6 @@ h2{
 /* ---------- CREATOR PROFILE PAGE ---------- */
 #creator-profile-content{
     max-width:900px;margin:auto;
-    opacity:0;transform:translateY(30px);
-    animation:fadeInUpDetail .7s ease-out forwards;
 }
 .profile-banner{
     height:220px;width:100%;object-fit:cover;border-radius:14px;
@@ -344,15 +385,9 @@ h2{
     box-shadow:0 6px 18px rgba(0,0,0,.3);
     transition:transform .3s,box-shadow .3s;
     cursor:pointer;
-    opacity:0;transform:translateY(20px);
-    animation:fadeInUpCard .6s ease-out forwards;
+    opacity: 0;
+    transform: translateY(30px);
 }
-.leaderboard-card:nth-child(1){animation-delay:.1s;}
-.leaderboard-card:nth-child(2){animation-delay:.15s;}
-.leaderboard-card:nth-child(3){animation-delay:.2s;}
-.leaderboard-card:nth-child(4){animation-delay:.25s;}
-.leaderboard-card:nth-child(5){animation-delay:.3s;}
-.leaderboard-card:nth-child(6){animation-delay:.35s;}
 .leaderboard-card:hover{
     transform:translateY(-6px);
     box-shadow:0 12px 30px rgba(0,198,255,.2);
@@ -383,14 +418,59 @@ h2{
     -webkit-text-fill-color:transparent;
 }
 
-/* ---------- ANIMATIONS ---------- */
-@keyframes fadeInUpCard{
-    from{opacity:0;transform:translateY(20px);}
-    to{opacity:1;transform:translateY(0);}
+/* ---------- SCROLL ANIMATIONS (via JS) ---------- */
+.animate-ready {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: all 0.8s ease-out;
 }
-@keyframes fadeInUpDetail{
-    from{opacity:0;transform:translateY(30px);}
-    to{opacity:1;transform:translateY(0);}
+
+.animate-in {
+    opacity: 1 !important;
+    transform: translateY(0) !important;
+}
+
+/* Stagger delays */
+.level-card:nth-child(odd) { transition-delay: 0.1s; }
+.level-card:nth-child(even) { transition-delay: 0.2s; }
+
+.leaderboard-card:nth-child(1) { transition-delay: 0.1s; }
+.leaderboard-card:nth-child(2) { transition-delay: 0.15s; }
+.leaderboard-card:nth-child(3) { transition-delay: 0.2s; }
+
+/* ---------- MICRO-INTERACTIONS ---------- */
+.avatar-click {
+    transition: transform .3s ease, box-shadow .3s ease;
+    cursor: pointer;
+}
+.avatar-click.pulse {
+    animation: pulseGlow 0.6s ease-out;
+}
+@keyframes pulseGlow {
+    0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(0, 198, 255, 0.7); }
+    50% { transform: scale(1.1); box-shadow: 0 0 0 12px rgba(0, 198, 255, 0); }
+    100% { transform: scale(1); }
+}
+
+.copy-btn {
+    position: relative;
+    overflow: hidden;
+}
+.copy-btn.copied {
+    background: #00ff88 !important;
+}
+.copy-btn.copied::after {
+    content: '';
+    position: absolute;
+    top: 50%; left: 50%;
+    width: 5px; height: 5px;
+    background: rgba(255,255,255,.5);
+    border-radius: 50%;
+    transform: translate(-50%, -50%) scale(1);
+    animation: ripple 0.6s ease-out;
+}
+@keyframes ripple {
+    to { transform: translate(-50%, -50%) scale(20); opacity: 0; }
 }
 
 /* ---------- MOBILE ---------- */
@@ -415,47 +495,5 @@ h2{
     .level-id-bar input{font-size:1rem;}
     .team-grid{grid-template-columns:1fr;}
     .leaderboard-tabs{justify-content:center;}
-}
-
-/* Avatar Click Animation */
-.avatar-click {
-    transition: transform .3s ease, box-shadow .3s ease;
-    cursor: pointer;
-}
-.avatar-click.pulse {
-    animation: pulseGlow 0.6s ease-out;
-}
-@keyframes pulseGlow {
-    0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(0, 198, 255, 0.7); }
-    50% { transform: scale(1.1); box-shadow: 0 0 0 15px rgba(0, 198, 255, 0); }
-    100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(0, 198, 255, 0); }
-}
-
-/* Copy Button Animation */
-.copy-btn {
-    position: relative;
-    overflow: hidden;
-}
-.copy-btn.copied {
-    background: #00ff88 !important;
-    transform: scale(1.05);
-}
-.copy-btn.copied::after {
-    content: '';
-    position: absolute;
-    top: 50%; left: 50%;
-    width: 5px; height: 5px;
-    background: rgba(255,255,255,.5);
-    opacity: 0;
-    border-radius: 100%;
-    transform: scale(1) translate(-50%, -50%);
-    animation: ripple 0.6s ease-out;
-}
-@keyframes ripple {
-    to {
-        width: 300px;
-        height: 300px;
-        opacity: 0;
-        transform: scale(20) translate(-50%, -50%);
-    }
+    .random-btn { width: 36px; height: 36px; font-size: 1rem; }
 }
