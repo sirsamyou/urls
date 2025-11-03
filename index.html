@@ -31,11 +31,19 @@
         <!-- Speedrun Page -->
         <section id="speedrun" class="page active">
             <h2>Speedrun Levels</h2>
+
+            <!-- Random Button -->
+            <div class="random-level-wrapper">
+                <button id="random-speedrun-btn" class="random-btn" aria-label="Random Speedrun Level">
+                    <i class="fas fa-dice"></i>
+                </button>
+            </div>
+
             <div class="filter-bar">
                 <input type="text" id="speedrun-search" placeholder="Search…">
                 <div class="sort-btns">
-                    <button data-type="speedrun" data-sort="recent" class="sort-btn active"><i class="fas fa-clock"></i> Recent</button>
-                    <button data-type="speedrun" data-sort="rated" class="sort-btn"><i class="fas fa-star"></i> Rating</button>
+                    <button data-type="speedrun" data-sort="recent" class="sort-btn"><i class="fas fa-clock"></i> Recent</button>
+                    <button data-type="speedrun" data-sort="rated" class="sort-btn active"><i class="fas fa-star"></i> Rating</button>
                 </div>
             </div>
             <div id="speedrun-list" class="levels-grid"></div>
@@ -44,11 +52,19 @@
         <!-- Hard Page -->
         <section id="hard" class="page">
             <h2>Hard Levels</h2>
+
+            <!-- Random Button -->
+            <div class="random-level-wrapper">
+                <button id="random-hard-btn" class="random-btn" aria-label="Random Hard Level">
+                    <i class="fas fa-dice"></i>
+                </button>
+            </div>
+
             <div class="filter-bar">
                 <input type="text" id="hard-search" placeholder="Search…">
                 <div class="sort-btns">
-                    <button data-type="hard" data-sort="recent" class="sort-btn active"><i class="fas fa-clock"></i> Recent</button>
-                    <button data-type="hard" data-sort="rated" class="sort-btn"><i class="fas fa-star"></i> Rating</button>
+                    <button data-type="hard" data-sort="recent" class="sort-btn"><i class="fas fa-clock"></i> Recent</button>
+                    <button data-type="hard" data-sort="rated" class="sort-btn active"><i class="fas fa-star"></i> Rating</button>
                 </div>
             </div>
             <div id="hard-list" class="levels-grid"></div>
