@@ -8,6 +8,11 @@ class URLSApp {
         this.currentLeaderboard = 'points';
         this.currentPage = 'speedrun';
         this.lastListPage = 'speedrun';
+        this.filterState = {
+            speedrun: { search: '', sort: 'rated' },
+            hard: { search: '', sort: 'rated' },
+            creator: { search: '', sort: 'rated' }
+        };
         this.init();
     }
 
@@ -45,6 +50,11 @@ class URLSApp {
     getRankIcon(rank) {
         if (!rank) return '';
         return `assets/${rank}ranking.png`;
+    }
+
+    // Helper to format ratings to 1 decimal
+    formatRating(num) {
+        return Number(num.toFixed(1));
     }
 
     aggregateCreators() {
@@ -132,8 +142,11 @@ class URLSApp {
                 const sort = btn.dataset.sort;
                 document.querySelectorAll(`.sort-btn[data-type="${type}"]`).forEach(b => b.classList.remove('active'));
                 btn.classList.add('active');
-                const searchEl = document.getElementById(`${type}-search`);
-                this.filterSort(type, searchEl ? searchEl.value : '', sort);
+                const searchEl = document.getElementById(`${type}-search`) || document.getElementById('creator-search');
+                const search = searchEl ? searchEl.value : '';
+                this.filterState[type].sort = sort;
+                this.filterState[type].search = search;
+                this.filterSort(type, search, sort);
             });
         });
 
@@ -141,9 +154,19 @@ class URLSApp {
         ['speedrun', 'hard'].forEach(type => {
             const el = document.getElementById(`${type}-search`);
             if (el) el.addEventListener('input', e => {
-                const sort = document.querySelector(`.sort-btn[data-type="${type}"].active`).dataset.sort;
+                const sort = this.filterState[type].sort;
+                this.filterState[type].search = e.target.value;
                 this.filterSort(type, e.target.value, sort);
             });
+        });
+
+        // creator search
+        document.body.addEventListener('input', e => {
+            if (e.target.id === 'creator-search') {
+                const sort = this.filterState.creator.sort;
+                this.filterState.creator.search = e.target.value;
+                this.renderCreatorLevels(e.target.value, sort);
+            }
         });
     }
 
@@ -215,7 +238,7 @@ class URLSApp {
                     </div>
                     <div class="team-member">
                         <img src="${this.profiles.get('Ripted')?.avatar || 'thumbs/default-avatar.png'}" alt="Ripted">
-                        <strong>Ripted</strong><span>Rater & Designer</span>
+                        <strong>Ripted</strong><span>Rater & Helper</span>
                     </div>
                     <div class="team-member">
                         <img src="${this.profiles.get('Ch4mpY')?.avatar || 'thumbs/default-avatar.png'}" alt="Ch4mpY">
@@ -228,7 +251,20 @@ class URLSApp {
                 </div>
             </div>
 
-            <p style="margin-top:2rem;font-style:italic;text-align:center;">Made with passion for the community</p>
+            <div class="faq-section">
+                <h3>Submission Rules</h3>
+                <p><strong>Important:</strong> Inappropriate, offensive, or rule-breaking levels will not be rated and may be rejected.</p>
+            </div>
+
+            <div style="margin-top:2rem;text-align:center;">
+                <p style="color:#aaa;font-size:.95rem;">
+                    Affiliated with 
+                    <a href="https://sirsamyou.github.io/narrowlist/" target="_blank" style="color:#00c6ff;text-decoration:none;">
+                        <img src="assets/narrowlist-icon.png" alt="Narrowlist" style="width:20px;height:20px;vertical-align:middle;margin-right:4px;">
+                        The Narrowlist
+                    </a>
+                </p>
+            </div>
         `;
     }
 
@@ -247,14 +283,21 @@ class URLSApp {
         this.renderList(type, list);
     }
 
-    renderLevels(type) { this.filterSort(type, '', 'recent'); }
+    renderLevels(type) {
+        const state = this.filterState[type];
+        this.filterSort(type, state.search, state.sort);
+        // Set active sort button
+        document.querySelectorAll(`.sort-btn[data-type="${type}"]`).forEach(b => {
+            b.classList.toggle('active', b.dataset.sort === state.sort);
+        });
+    }
 
     renderList(type, levels) {
         const container = document.getElementById(type === 'speedrun' ? 'speedrun-list' : 'hard-list');
         container.innerHTML = levels.map(l => {
             const ratings = type === 'speedrun'
-                ? l.ratings.gameplay + l.ratings.design + l.ratings.speedrunning
-                : l.ratings.speedrun + l.ratings.design + l.ratings.difficulty;
+                ? this.formatRating(l.ratings.gameplay + l.ratings.design + l.ratings.speedrunning)
+                : this.formatRating(l.ratings.speedrun + l.ratings.design + l.ratings.difficulty);
             const rank = type === 'speedrun' ? this.getRank(ratings) : null;
             const rankIcon = rank ? `<img src="${this.getRankIcon(rank)}" class="rank-badge" alt="${rank} rank">` : '';
             const profile = this.profiles.get(l.creator) || { avatar: 'thumbs/default-avatar.png' };
@@ -298,11 +341,11 @@ class URLSApp {
 
         let total, rank, rankIcon;
         if (type === 'speedrun') {
-            total = lvl.ratings.gameplay + lvl.ratings.design + lvl.ratings.speedrunning;
+            total = this.formatRating(lvl.ratings.gameplay + lvl.ratings.design + lvl.ratings.speedrunning);
             rank = this.getRank(total);
             rankIcon = rank ? `<img src="${this.getRankIcon(rank)}" alt="${rank}">` : '';
         } else {
-            total = lvl.ratings.speedrun + lvl.ratings.design + lvl.ratings.difficulty;
+            total = this.formatRating(lvl.ratings.speedrun + lvl.ratings.design + lvl.ratings.difficulty);
             rank = null;
             rankIcon = '';
         }
@@ -313,7 +356,7 @@ class URLSApp {
                 <h1>${lvl.name}</h1>
                 <div class="creator-info" style="margin:1rem 0;display:flex;align-items:center;gap:.5rem;">
                     <span><strong>Creator:</strong></span>
-                    <img src="${profile.avatar}" alt="${lvl.creator}" style="width:32px;height:32px;border-radius:50%;border:2px solid #00c6ff;">
+                    <img src="${profile.avatar}" alt="${lvl.creator}" style="width:32px;height:32px;border-radius:50%;border:2px solid #00c6ff;cursor:pointer;" class="avatar-click">
                     <span class="creator-link" data-creator="${lvl.creator}" style="font-size:1.1rem;">${lvl.creator}</span>
                 </div>
                 <p><strong>Created:</strong> ${new Date(lvl.created).toLocaleDateString()}</p>
@@ -328,8 +371,8 @@ class URLSApp {
                 <div class="level-id-bar">
                     <span class="id-label">ID:</span>
                     <input type="text" value="${lvl.id}" readonly>
-                    <button class="copy-btn" onclick="navigator.clipboard.writeText('${lvl.id}')">
-                        <i class="fas fa-copy"></i> Copy
+                    <button class="copy-btn">
+                        <i class="fas fa-copy"></i> <span>Copy</span>
                     </button>
                     <a href="${lvl.link}" target="_blank" class="play-btn">
                         <i class="fas fa-play"></i> Play
@@ -341,33 +384,55 @@ class URLSApp {
                     ${type === 'speedrun' ? `
                     <div class="rating-item">
                         <span>Gameplay</span>
-                        <span class="rating-value">${lvl.ratings.gameplay}/10</span>
+                        <span class="rating-value">${this.formatRating(lvl.ratings.gameplay)}/10</span>
                     </div>
                     <div class="rating-item">
                         <span>Design</span>
-                        <span class="rating-value">${lvl.ratings.design}/10</span>
+                        <span class="rating-value">${this.formatRating(lvl.ratings.design)}/10</span>
                     </div>
                     <div class="rating-item">
                         <span>Speedrunning</span>
-                        <span class="rating-value">${lvl.ratings.speedrunning}/10</span>
+                        <span class="rating-value">${this.formatRating(lvl.ratings.speedrunning)}/10</span>
                     </div>
                     ` : `
                     <div class="rating-item">
                         <span>Speedrun</span>
-                        <span class="rating-value">${lvl.ratings.speedrun}/10</span>
+                        <span class="rating-value">${this.formatRating(lvl.ratings.speedrun)}/10</span>
                     </div>
                     <div class="rating-item">
                         <span>Design</span>
-                        <span class="rating-value">${lvl.ratings.design}/10</span>
+                        <span class="rating-value">${this.formatRating(lvl.ratings.design)}/10</span>
                     </div>
                     <div class="rating-item">
                         <span>Difficulty</span>
-                        <span class="rating-value">${lvl.ratings.difficulty}/10</span>
+                        <span class="rating-value">${this.formatRating(lvl.ratings.difficulty)}/10</span>
                     </div>
                     `}
                 </div>
             </div>
         `;
+
+        // Copy button with animation
+        const copyBtn = document.querySelector('#level-detail-content .copy-btn');
+        const copyText = copyBtn.querySelector('span');
+        copyBtn.addEventListener('click', () => {
+            navigator.clipboard.writeText(lvl.id);
+            copyText.textContent = 'Copied!';
+            copyBtn.classList.add('copied');
+            setTimeout(() => {
+                copyText.textContent = 'Copy';
+                copyBtn.classList.remove('copied');
+            }, 1500);
+        });
+
+        // Avatar click animation
+        document.querySelectorAll('.avatar-click').forEach(img => {
+            img.addEventListener('click', e => {
+                e.stopPropagation();
+                img.classList.add('pulse');
+                setTimeout(() => img.classList.remove('pulse'), 600);
+            });
+        });
 
         document.querySelector('#level-detail-content .creator-link').addEventListener('click', e => {
             this.showCreatorPage(e.target.dataset.creator);
@@ -384,7 +449,7 @@ class URLSApp {
         let levels = [...data.levels];
         levels.sort((a, b) => new Date(b.created) - new Date(a.created));
 
-        const renderLevels = (search = '', sort = 'recent') => {
+        const renderCreatorLevels = (search = '', sort = 'rated') => {
             let filtered = levels.filter(l => l.name.toLowerCase().includes(search.toLowerCase()));
             if (sort === 'rated') {
                 filtered.sort((a, b) => {
@@ -398,8 +463,8 @@ class URLSApp {
             const grid = document.querySelector('#creator-profile-content .levels-grid');
             grid.innerHTML = filtered.map(l => {
                 const ratings = l.type === 'speedrun'
-                    ? l.ratings.gameplay + l.ratings.design + l.ratings.speedrunning
-                    : l.ratings.speedrun + l.ratings.design + l.ratings.difficulty;
+                    ? this.formatRating(l.ratings.gameplay + l.ratings.design + l.ratings.speedrunning)
+                    : this.formatRating(l.ratings.speedrun + l.ratings.design + l.ratings.difficulty);
                 const rank = l.type === 'speedrun' ? this.getRank(ratings) : null;
                 const rankIcon = rank ? `<img src="${this.getRankIcon(rank)}" class="rank-badge" alt="${rank}">` : '';
                 return `
@@ -425,7 +490,7 @@ class URLSApp {
         document.getElementById('creator-profile-content').innerHTML = `
             <img src="${profile.banner}" class="profile-banner" alt="${name}'s banner">
             <div class="profile-header">
-                <img src="${profile.avatar}" class="profile-pic" alt="${name}">
+                <img src="${profile.avatar}" class="profile-pic avatar-click" alt="${name}">
                 <div class="profile-info">
                     <h1>${name}</h1>
                     <div class="profile-stats">
@@ -443,8 +508,8 @@ class URLSApp {
                 <div class="filter-bar">
                     <input type="text" id="creator-search" placeholder="Search…">
                     <div class="sort-btns">
-                        <button data-type="creator" data-sort="recent" class="sort-btn active"><i class="fas fa-clock"></i> Recent</button>
-                        <button data-type="creator" data-sort="rated" class="sort-btn"><i class="fas fa-star"></i> Rating</button>
+                        <button data-type="creator" data-sort="recent" class="sort-btn"><i class="fas fa-clock"></i> Recent</button>
+                        <button data-type="creator" data-sort="rated" class="sort-btn active"><i class="fas fa-star"></i> Rating</button>
                     </div>
                 </div>
                 <div class="levels-grid"></div>
@@ -456,14 +521,25 @@ class URLSApp {
         btns.forEach(b => b.addEventListener('click', () => {
             btns.forEach(bb => bb.classList.remove('active'));
             b.classList.add('active');
-            renderLevels(search.value, b.dataset.sort);
+            this.filterState.creator.sort = b.dataset.sort;
+            renderCreatorLevels(search.value, b.dataset.sort);
         }));
         search.addEventListener('input', () => {
-            const sort = document.querySelector('#creator-profile-content .sort-btn.active').dataset.sort;
-            renderLevels(search.value, sort);
+            const sort = this.filterState.creator.sort;
+            this.filterState.creator.search = search.value;
+            renderCreatorLevels(search.value, sort);
         });
-        renderLevels();
 
+        // Avatar click animation
+        document.querySelectorAll('.avatar-click').forEach(img => {
+            img.addEventListener('click', e => {
+                e.stopPropagation();
+                img.classList.add('pulse');
+                setTimeout(() => img.classList.remove('pulse'), 600);
+            });
+        });
+
+        renderCreatorLevels(this.filterState.creator.search, this.filterState.creator.sort);
         this.switchPage('creator-profile-page');
     }
 
