@@ -23,6 +23,7 @@ class URLSApp {
         this.calculateLeaderboard();
         this.render();
         this.bindEvents();
+        this.animateOnScroll();
     }
 
     async loadData() {
@@ -52,7 +53,6 @@ class URLSApp {
         return `assets/${rank}ranking.png`;
     }
 
-    // Helper to format ratings to 1 decimal
     formatRating(num) {
         return Number(num.toFixed(1));
     }
@@ -158,6 +158,27 @@ class URLSApp {
                 this.filterState[type].search = e.target.value;
                 this.filterSort(type, e.target.value, sort);
             });
+        });
+
+        // Random Level Buttons
+        document.getElementById('random-speedrun-btn')?.addEventListener('click', () => {
+            const rated = this.speedrunLevels.filter(l => {
+                const total = l.ratings.gameplay + l.ratings.design + l.ratings.speedrunning;
+                return total >= 10;
+            });
+            if (rated.length === 0) return;
+            const random = rated[Math.floor(Math.random() * rated.length)];
+            this.showLevelPage('speedrun', random.id);
+        });
+
+        document.getElementById('random-hard-btn')?.addEventListener('click', () => {
+            const rated = this.hardLevels.filter(l => {
+                const total = l.ratings.speedrun + l.ratings.design + l.ratings.difficulty;
+                return total >= 10;
+            });
+            if (rated.length === 0) return;
+            const random = rated[Math.floor(Math.random() * rated.length)];
+            this.showLevelPage('hard', random.id);
         });
 
         // creator search
@@ -286,7 +307,6 @@ class URLSApp {
     renderLevels(type) {
         const state = this.filterState[type];
         this.filterSort(type, state.search, state.sort);
-        // Set active sort button
         document.querySelectorAll(`.sort-btn[data-type="${type}"]`).forEach(b => {
             b.classList.toggle('active', b.dataset.sort === state.sort);
         });
@@ -302,8 +322,8 @@ class URLSApp {
             const rankIcon = rank ? `<img src="${this.getRankIcon(rank)}" class="rank-badge" alt="${rank} rank">` : '';
             const profile = this.profiles.get(l.creator) || { avatar: 'thumbs/default-avatar.png' };
             return `
-                <div class="level-card" data-id="${l.id}" data-type="${type}">
-                    <img src="${l.thumbnail}" alt="${l.name}">
+                <div class="level-card" data-id="${l.id}" data-type="${type}" tabindex="0">
+                    <img src="${l.thumbnail}" alt="${l.name}" loading="lazy">
                     <div class="level-info">
                         <h3>${l.name}</h3>
                         <div class="creator-info">
@@ -325,6 +345,12 @@ class URLSApp {
             card.addEventListener('click', e => {
                 if (e.target.classList.contains('creator-link')) return;
                 this.showLevelPage(card.dataset.type, card.dataset.id);
+            });
+            card.addEventListener('keydown', e => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    this.showLevelPage(card.dataset.type, card.dataset.id);
+                }
             });
         });
         container.querySelectorAll('.creator-link').forEach(l => l.addEventListener('click', e => {
@@ -351,7 +377,7 @@ class URLSApp {
         }
 
         document.getElementById('level-detail-content').innerHTML = `
-            <img src="${lvl.thumbnail}" class="level-detail-img" alt="${lvl.name}">
+            <img src="${lvl.thumbnail}" class="level-detail-img" alt="${lvl.name}" loading="lazy">
             <div class="level-detail-info">
                 <h1>${lvl.name}</h1>
                 <div class="creator-info" style="margin:1rem 0;display:flex;align-items:center;gap:.5rem;">
@@ -370,8 +396,8 @@ class URLSApp {
 
                 <div class="level-id-bar">
                     <span class="id-label">ID:</span>
-                    <input type="text" value="${lvl.id}" readonly>
-                    <button class="copy-btn">
+                    <input type="text" value="${lvl.id}" readonly aria-label="Level ID">
+                    <button class="copy-btn" aria-label="Copy ID">
                         <i class="fas fa-copy"></i> <span>Copy</span>
                     </button>
                     <a href="${lvl.link}" target="_blank" class="play-btn">
@@ -412,7 +438,6 @@ class URLSApp {
             </div>
         `;
 
-        // Copy button with animation
         const copyBtn = document.querySelector('#level-detail-content .copy-btn');
         const copyText = copyBtn.querySelector('span');
         copyBtn.addEventListener('click', () => {
@@ -425,7 +450,6 @@ class URLSApp {
             }, 1500);
         });
 
-        // Avatar click animation
         document.querySelectorAll('.avatar-click').forEach(img => {
             img.addEventListener('click', e => {
                 e.stopPropagation();
@@ -468,8 +492,8 @@ class URLSApp {
                 const rank = l.type === 'speedrun' ? this.getRank(ratings) : null;
                 const rankIcon = rank ? `<img src="${this.getRankIcon(rank)}" class="rank-badge" alt="${rank}">` : '';
                 return `
-                    <div class="level-card" data-id="${l.id}" data-type="${l.type}">
-                        <img src="${l.thumbnail}" alt="${l.name}">
+                    <div class="level-card" data-id="${l.id}" data-type="${l.type}" tabindex="0">
+                        <img src="${l.thumbnail}" alt="${l.name}" loading="lazy">
                         <div class="level-info">
                             <h3>${l.name}</h3>
                             <p><strong>Type:</strong> ${l.type.charAt(0).toUpperCase() + l.type.slice(1)}</p>
@@ -482,13 +506,19 @@ class URLSApp {
                     </div>
                 `;
             }).join('');
-            grid.querySelectorAll('.level-card').forEach(c => c.addEventListener('click', () => {
-                this.showLevelPage(c.dataset.type, c.dataset.id);
-            }));
+            grid.querySelectorAll('.level-card').forEach(c => {
+                c.addEventListener('click', () => this.showLevelPage(c.dataset.type, c.dataset.id));
+                c.addEventListener('keydown', e => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        this.showLevelPage(c.dataset.type, c.dataset.id);
+                    }
+                });
+            });
         };
 
         document.getElementById('creator-profile-content').innerHTML = `
-            <img src="${profile.banner}" class="profile-banner" alt="${name}'s banner">
+            <img src="${profile.banner}" class="profile-banner" alt="${name}'s banner" loading="lazy">
             <div class="profile-header">
                 <img src="${profile.avatar}" class="profile-pic avatar-click" alt="${name}">
                 <div class="profile-info">
@@ -530,7 +560,6 @@ class URLSApp {
             renderCreatorLevels(search.value, sort);
         });
 
-        // Avatar click animation
         document.querySelectorAll('.avatar-click').forEach(img => {
             img.addEventListener('click', e => {
                 e.stopPropagation();
@@ -567,8 +596,8 @@ class URLSApp {
             else if (type === 'hard') value = `${d.hardCount} Hard`;
 
             return `
-                <div class="leaderboard-card" data-creator="${name}">
-                    <img src="${profile.banner}" class="leaderboard-banner" alt="${name}'s banner">
+                <div class="leaderboard-card" data-creator="${name}" tabindex="0">
+                    <img src="${profile.banner}" class="leaderboard-banner" alt="${name}'s banner" loading="lazy">
                     <div class="leaderboard-content">
                         <div class="leaderboard-info">
                             <img src="${profile.avatar}" class="leaderboard-avatar" alt="${name}">
@@ -584,8 +613,12 @@ class URLSApp {
         }).join('');
 
         container.querySelectorAll('.leaderboard-card').forEach(card => {
-            card.addEventListener('click', () => {
-                this.showCreatorPage(card.dataset.creator);
+            card.addEventListener('click', () => this.showCreatorPage(card.dataset.creator));
+            card.addEventListener('keydown', e => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    this.showCreatorPage(card.dataset.creator);
+                }
             });
         });
     }
@@ -594,6 +627,22 @@ class URLSApp {
         this.renderLevels('speedrun');
         this.renderLevels('hard');
         this.renderLeaderboard();
+    }
+
+    // Scroll Animations
+    animateOnScroll() {
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('animate-in');
+                }
+            });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll('.level-card, .leaderboard-card, .team-member, .faq-section').forEach(el => {
+            el.classList.add('animate-ready');
+            observer.observe(el);
+        });
     }
 }
 
