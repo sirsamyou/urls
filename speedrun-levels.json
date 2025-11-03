@@ -12,5 +12,145 @@
             "design": 7.5,
             "speedrunning": 8.2
         }
+    },
+    {
+        "id": 1760944480744,
+        "name": "Rigid Grace",
+        "creator": "sqm",
+        "thumbnail": "thumbs/rigid-grace.png",
+        "created": "2025-10-20",
+        "link": "https://narrowarrow.xyz/levelid=1760944480744",
+        "type": "speedrun",
+        "ratings": {
+            "gameplay": 4.7,
+            "design": 5.3,
+            "speedrunning": 4.8
+        }
+    },
+    {
+        "id": 1760774117676,
+        "name": "Vapor Construct",
+        "creator": "sqm",
+        "thumbnail": "thumbs/vapor-construct.png",
+        "created": "2025-10-18",
+        "link": "https://narrowarrow.xyz/levelid=1760774117676",
+        "type": "speedrun",
+        "ratings": {
+            "gameplay": 4.5,
+            "design": 5.6,
+            "speedrunning": 4.4
+        }
+    },
+    {
+        "id": 1757748811533,
+        "name": "Rebound Riot",
+        "creator": "sqm",
+        "thumbnail": "thumbs/rebound-riot.png",
+        "created": "2025-09-13",
+        "link": "https://narrowarrow.xyz/levelid=1757748811533",
+        "type": "speedrun",
+        "ratings": {
+            "gameplay": 5.4,
+            "design": 8.4,
+            "speedrunning": 5.8
+        }
+    },
+    {
+        "id": 1756059112675,
+        "name": "Flingzone",
+        "creator": "sqm",
+        "thumbnail": "thumbs/flingzone.png",
+        "created": "2025-08-24",
+        "link": "https://narrowarrow.xyz/levelid=1756059112675",
+        "type": "speedrun",
+        "ratings": {
+            "gameplay": 6.9,
+            "design": 6.4,
+            "speedrunning": 6.4
+        }
+    },
+    {
+        "id": 1759054893591,
+        "name": "Narrow path of 1057",
+        "creator": "sqm",
+        "thumbnail": "thumbs/narrow-path-of-1057.png",
+        "created": "2025-09-28",
+        "link": "https://narrowarrow.xyz/levelid=1759054893591",
+        "type": "speedrun",
+        "ratings": {
+            "gameplay": 4.9,
+            "design": 5.5,
+            "speedrunning": 4.8
+        }
+    },
+    {
+        "id": 1753515154554,
+        "name": "Squarefall",
+        "creator": "sqm",
+        "thumbnail": "thumbs/squarefall.png",
+        "created": "2025-07-26",
+        "link": "https://narrowarrow.xyz/levelid=1753515154554",
+        "type": "speedrun",
+        "ratings": {
+            "gameplay": 8.6,
+            "design": 9.0,
+            "speedrunning": 8.2
+        }
+    },
+    {
+        "id": 1759490489523,
+        "name": "Twin Gaze",
+        "creator": "sqm",
+        "thumbnail": "thumbs/twin-gaze.png",
+        "created": "2025-10-03",
+        "link": "https://narrowarrow.xyz/levelid=1759490489523",
+        "type": "speedrun",
+        "ratings": {
+            "gameplay": 6.0,
+            "design": 6.9,
+            "speedrunning": 6.2
+        }
+    },
+    {
+        "id": 1760250771513,
+        "name": "Linked Rhombs",
+        "creator": "sqm",
+        "thumbnail": "thumbs/linked-rhombs.png",
+        "created": "2025-10-11",
+        "link": "https://narrowarrow.xyz/levelid=1760250771513",
+        "type": "speedrun",
+        "ratings": {
+            "gameplay": 7.5,
+            "design": 7.5,
+            "speedrunning": 8.0
+        }
+    },
+    {
+        "id": 1749332940447,
+        "name": "Solid Squares",
+        "creator": "sqm",
+        "thumbnail": "thumbs/solid-squares.png",
+        "created": "2025-06-07",
+        "link": "https://narrowarrow.xyz/levelid=1749332940447",
+        "type": "speedrun",
+        "ratings": {
+            "gameplay": 8.7,
+            "design": 9.1,
+            "speedrunning": 8.5
+        }
+    },
+    {
+        "id": 1758205592238,
+        "name": "Cobweb",
+        "creator": "Paul",
+        "thumbnail": "thumbs/cobweb.png",
+        "created": "2025-09-20",
+        "link": "https://narrowarrow.xyz/levelid=1758205592238",
+        "type": "speedrun",
+        "ratings": {
+            "gameplay": 6.8,
+            "design": 9.0,
+            "speedrunning": 7.2
+        }
     }
 ]
