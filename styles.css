@@ -416,3 +416,46 @@ h2{
     .team-grid{grid-template-columns:1fr;}
     .leaderboard-tabs{justify-content:center;}
 }
+
+/* Avatar Click Animation */
+.avatar-click {
+    transition: transform .3s ease, box-shadow .3s ease;
+    cursor: pointer;
+}
+.avatar-click.pulse {
+    animation: pulseGlow 0.6s ease-out;
+}
+@keyframes pulseGlow {
+    0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(0, 198, 255, 0.7); }
+    50% { transform: scale(1.1); box-shadow: 0 0 0 15px rgba(0, 198, 255, 0); }
+    100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(0, 198, 255, 0); }
+}
+
+/* Copy Button Animation */
+.copy-btn {
+    position: relative;
+    overflow: hidden;
+}
+.copy-btn.copied {
+    background: #00ff88 !important;
+    transform: scale(1.05);
+}
+.copy-btn.copied::after {
+    content: '';
+    position: absolute;
+    top: 50%; left: 50%;
+    width: 5px; height: 5px;
+    background: rgba(255,255,255,.5);
+    opacity: 0;
+    border-radius: 100%;
+    transform: scale(1) translate(-50%, -50%);
+    animation: ripple 0.6s ease-out;
+}
+@keyframes ripple {
+    to {
+        width: 300px;
+        height: 300px;
+        opacity: 0;
+        transform: scale(20) translate(-50%, -50%);
+    }
+}
