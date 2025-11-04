@@ -25,7 +25,7 @@ class URLSApp {
         this.render();
         this.bindEvents();
         this.initScrollAnimation();
-        this.triggerInitialAnimations(); // NEW: Show visible cards immediately
+        this.applyInitialVisibility(); // NEW: Show all on load
     }
 
     async loadData() {
@@ -198,8 +198,8 @@ class URLSApp {
         this.currentPage = p;
 
         setTimeout(() => {
+            this.applyInitialVisibility();
             this.observeNewCards();
-            this.triggerInitialAnimations();
         }, 100);
     }
 
@@ -241,23 +241,23 @@ class URLSApp {
             <div class="faq-section">
                 <h3>Team</h3>
                 <div class="team-grid">
-                    <div class="team-member animate-ready">
+                    <div class="team-member">
                         <img src="${this.profiles.get('j89de')?.avatar || 'thumbs/default-avatar.png'}" alt="j89de">
                         <strong>j89de</strong><span>Founder & Rater</span>
                     </div>
-                    <div class="team-member animate-ready">
+                    <div class="team-member">
                         <img src="${this.profiles.get('sqm')?.avatar || 'thumbs/default-avatar.png'}" alt="sqm">
                         <strong>sqm</strong><span>Designer</span>
                     </div>
-                    <div class="team-member animate-ready">
+                    <div class="team-member">
                         <img src="${this.profiles.get('Ripted')?.avatar || 'thumbs/default-avatar.png'}" alt="Ripted">
                         <strong>Ripted</strong><span>Rater & Helper</span>
                     </div>
-                    <div class="team-member animate-ready">
+                    <div class="team-member">
                         <img src="${this.profiles.get('Ch4mpY')?.avatar || 'thumbs/default-avatar.png'}" alt="Ch4mpY">
                         <strong>Ch4mpY</strong><span>Rater</span>
                     </div>
-                    <div class="team-member animate-ready">
+                    <div class="team-member">
                         <img src="${this.profiles.get('Polar')?.avatar || 'thumbs/default-avatar.png'}" alt="Polar">
                         <strong>Polar</strong><span>Rater</span>
                     </div>
@@ -277,8 +277,8 @@ class URLSApp {
                 </p>
             </div>
         `;
+        this.applyInitialVisibility();
         this.observeNewCards();
-        this.triggerInitialAnimations();
     }
 
     filterSort(type, search, sort) {
@@ -314,7 +314,7 @@ class URLSApp {
             const rankIcon = rank ? `<img src="${this.getRankIcon(rank)}" class="rank-badge" alt="${rank} rank">` : '';
             const profile = this.profiles.get(l.creator) || { avatar: 'thumbs/default-avatar.png' };
             return `
-                <div class="level-card animate-ready" data-id="${l.id}" data-type="${type}" tabindex="0">
+                <div class="level-card" data-id="${l.id}" data-type="${type}" tabindex="0">
                     <img src="${l.thumbnail}" alt="${l.name}" loading="lazy">
                     <div class="level-info">
                         <h3>${l.name}</h3>
@@ -334,8 +334,8 @@ class URLSApp {
         }).join('');
 
         this.bindCardEvents(container);
+        this.applyInitialVisibility();
         this.observeNewCards();
-        this.triggerInitialAnimations();
     }
 
     bindCardEvents(container) {
@@ -490,7 +490,7 @@ class URLSApp {
                 const rank = l.type === 'speedrun' ? this.getRank(ratings) : null;
                 const rankIcon = rank ? `<img src="${this.getRankIcon(rank)}" class="rank-badge" alt="${rank}">` : '';
                 return `
-                    <div class="level-card animate-ready" data-id="${l.id}" data-type="${l.type}" tabindex="0">
+                    <div class="level-card" data-id="${l.id}" data-type="${l.type}" tabindex="0">
                         <img src="${l.thumbnail}" alt="${l.name}" loading="lazy">
                         <div class="level-info">
                             <h3>${l.name}</h3>
@@ -505,8 +505,8 @@ class URLSApp {
                 `;
             }).join('');
             this.bindCardEvents(grid);
+            this.applyInitialVisibility();
             this.observeNewCards();
-            this.triggerInitialAnimations();
         };
 
         document.getElementById('creator-profile-content').innerHTML = `
@@ -518,7 +518,7 @@ class URLSApp {
                     <div class="profile-stats">
                         <div class="profile-stat"><strong>${data.totalPoints.toFixed(2)}</strong> Creator Points</div>
                         <div class="profile-stat"><strong>#${data.posPoints || '-'}</strong> Points Rank</div>
-                        <div class="profile-checked"><strong>${data.totalLevels}</strong> Total Maps</div>
+                        <div class="profile-stat"><strong>${data.totalLevels}</strong> Total Maps</div>
                         <div class="profile-stat"><strong>#${data.posTotal || '-'}</strong> Maps Rank</div>
                         <div class="profile-stat"><strong>${data.speedrunCount}</strong> Speedrun</div>
                         <div class="profile-stat"><strong>${data.hardCount}</strong> Hard</div>
@@ -588,7 +588,7 @@ class URLSApp {
             else if (type === 'hard') value = `${d.hardCount} Hard`;
 
             return `
-                <div class="leaderboard-card animate-ready" data-creator="${name}" tabindex="0">
+                <div class="leaderboard-card" data-creator="${name}" tabindex="0">
                     <img src="${profile.banner}" class="leaderboard-banner" alt="${name}'s banner" loading="lazy">
                     <div class="leaderboard-content">
                         <div class="leaderboard-info">
@@ -614,18 +614,20 @@ class URLSApp {
             });
         });
 
+        this.applyInitialVisibility();
         this.observeNewCards();
-        this.triggerInitialAnimations();
     }
 
-    // NEW: Force animation on visible elements immediately
-    triggerInitialAnimations() {
+    // NEW: Show visible cards immediately, animate only off-screen ones
+    applyInitialVisibility() {
         requestAnimationFrame(() => {
-            document.querySelectorAll('.animate-ready').forEach(el => {
-                const rect = el.getBoundingClientRect();
+            document.querySelectorAll('.level-card, .leaderboard-card').forEach(card => {
+                const rect = card.getBoundingClientRect();
                 const isVisible = rect.top < window.innerHeight && rect.bottom > 0;
                 if (isVisible) {
-                    el.classList.add('animate-in');
+                    card.classList.add('animate-in');
+                } else {
+                    card.classList.add('animate-ready');
                 }
             });
         });
