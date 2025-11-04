@@ -13,7 +13,7 @@ class URLSApp {
             hard: { search: '', sort: 'rated' },
             creator: { search: '', sort: 'rated' }
         };
-        this.observer = null; // Store observer reference
+        this.observer = null;
         this.init();
     }
 
@@ -24,7 +24,8 @@ class URLSApp {
         this.calculateLeaderboard();
         this.render();
         this.bindEvents();
-        this.initScrollAnimation(); // Use new method
+        this.initScrollAnimation();
+        this.triggerInitialAnimations(); // NEW: Show visible cards immediately
     }
 
     async loadData() {
@@ -102,31 +103,26 @@ class URLSApp {
     }
 
     bindEvents() {
-        // URLS logo → FAQ
         document.getElementById('urls-logo').addEventListener('click', e => {
             e.preventDefault();
             this.switchPage('faq');
         });
 
-        // hamburger
         document.querySelector('.hamburger').addEventListener('click', () => {
             document.querySelector('.nav').classList.toggle('active');
         });
 
-        // navigation
         document.querySelectorAll('.nav a').forEach(a => a.addEventListener('click', e => {
             e.preventDefault(); this.switchPage(e.target.dataset.page);
             document.querySelector('.nav').classList.remove('active');
         }));
 
-        // back buttons
         document.querySelectorAll('.back-btn').forEach(btn => {
             btn.addEventListener('click', () => {
                 this.switchPage(this.lastListPage);
             });
         });
 
-        // leaderboard tabs
         document.querySelectorAll('.lb-tab').forEach(tab => {
             tab.addEventListener('click', () => {
                 document.querySelectorAll('.lb-tab').forEach(t => t.classList.remove('active'));
@@ -136,7 +132,6 @@ class URLSApp {
             });
         });
 
-        // sort buttons
         document.querySelectorAll('.sort-btn').forEach(btn => {
             btn.addEventListener('click', () => {
                 const type = btn.dataset.type;
@@ -151,7 +146,6 @@ class URLSApp {
             });
         });
 
-        // search
         ['speedrun', 'hard'].forEach(type => {
             const el = document.getElementById(`${type}-search`);
             if (el) el.addEventListener('input', e => {
@@ -161,7 +155,6 @@ class URLSApp {
             });
         });
 
-        // Random Level Buttons
         document.getElementById('random-speedrun-btn')?.addEventListener('click', () => {
             const rated = this.speedrunLevels.filter(l => {
                 const total = l.ratings.gameplay + l.ratings.design + l.ratings.speedrunning;
@@ -182,7 +175,6 @@ class URLSApp {
             this.showLevelPage('hard', random.id);
         });
 
-        // creator search
         document.body.addEventListener('input', e => {
             if (e.target.id === 'creator-search') {
                 const sort = this.filterState.creator.sort;
@@ -205,18 +197,18 @@ class URLSApp {
         else if (p === 'faq') this.renderFAQ();
         this.currentPage = p;
 
-        // Re-apply scroll animations after page switch
-        setTimeout(() => this.observeNewCards(), 100);
+        setTimeout(() => {
+            this.observeNewCards();
+            this.triggerInitialAnimations();
+        }, 100);
     }
 
     renderFAQ() {
         document.getElementById('faq-content').innerHTML = `
             <h1>URLS – Unofficial Rating Levels System</h1>
-
             <div class="faq-intro">
                 <p><strong>URLS</strong> is an <strong>Unofficial Rating Levels System</strong> for community-made levels. Our team of raters evaluates submissions based on gameplay, design, and speedrunning potential (or difficulty for hard levels).</p>
             </div>
-
             <div class="faq-section">
                 <h3>Speedrun Level Rating</h3>
                 <p>Speedrun maps are rated on three aspects:</p>
@@ -226,7 +218,6 @@ class URLSApp {
                     <li><strong>Speedrunning:</strong> How well it supports speedrun strategies (0–10)</li>
                 </ul>
             </div>
-
             <div class="faq-section">
                 <h3>Rank System</h3>
                 <p>Only levels with <strong>10+ total points</strong> are ranked:</p>
@@ -237,50 +228,45 @@ class URLSApp {
                     <li><img src="assets/mythicranking.png" alt="Mythic"> <strong>Mythic:</strong> 27+ / 30</li>
                 </ul>
             </div>
-
             <div class="faq-section">
                 <h3>Creator Points</h3>
                 <p>Every <strong>10 rating points</strong> a level earns = <strong>1 Creator Point</strong>.</p>
                 <p><strong>Example:</strong> A level rated <strong>14/30</strong> gives <strong>1.4 Creator Points</strong>.</p>
                 <p>These points are used in the <strong>Creator Points Leaderboard</strong>.</p>
             </div>
-
             <div class="faq-section">
                 <h3>Hard Levels</h3>
                 <p>Hard levels use the old system (Speedrun, Design, Difficulty) for now.</p>
             </div>
-
             <div class="faq-section">
                 <h3>Team</h3>
                 <div class="team-grid">
-                    <div class="team-member">
+                    <div class="team-member animate-ready">
                         <img src="${this.profiles.get('j89de')?.avatar || 'thumbs/default-avatar.png'}" alt="j89de">
                         <strong>j89de</strong><span>Founder & Rater</span>
                     </div>
-                    <div class="team-member">
+                    <div class="team-member animate-ready">
                         <img src="${this.profiles.get('sqm')?.avatar || 'thumbs/default-avatar.png'}" alt="sqm">
                         <strong>sqm</strong><span>Designer</span>
                     </div>
-                    <div class="team-member">
+                    <div class="team-member animate-ready">
                         <img src="${this.profiles.get('Ripted')?.avatar || 'thumbs/default-avatar.png'}" alt="Ripted">
                         <strong>Ripted</strong><span>Rater & Helper</span>
                     </div>
-                    <div class="team-member">
+                    <div class="team-member animate-ready">
                         <img src="${this.profiles.get('Ch4mpY')?.avatar || 'thumbs/default-avatar.png'}" alt="Ch4mpY">
                         <strong>Ch4mpY</strong><span>Rater</span>
                     </div>
-                    <div class="team-member">
+                    <div class="team-member animate-ready">
                         <img src="${this.profiles.get('Polar')?.avatar || 'thumbs/default-avatar.png'}" alt="Polar">
                         <strong>Polar</strong><span>Rater</span>
                     </div>
                 </div>
             </div>
-
             <div class="faq-section">
                 <h3>Submission Rules</h3>
                 <p><strong>Important:</strong> Inappropriate, offensive, or rule-breaking levels will not be rated and may be rejected.</p>
             </div>
-
             <div style="margin-top:2rem;text-align:center;">
                 <p style="color:#aaa;font-size:.95rem;">
                     Affiliated with 
@@ -291,7 +277,8 @@ class URLSApp {
                 </p>
             </div>
         `;
-        this.observeNewCards(); // Animate FAQ sections
+        this.observeNewCards();
+        this.triggerInitialAnimations();
     }
 
     filterSort(type, search, sort) {
@@ -348,6 +335,7 @@ class URLSApp {
 
         this.bindCardEvents(container);
         this.observeNewCards();
+        this.triggerInitialAnimations();
     }
 
     bindCardEvents(container) {
@@ -518,6 +506,7 @@ class URLSApp {
             }).join('');
             this.bindCardEvents(grid);
             this.observeNewCards();
+            this.triggerInitialAnimations();
         };
 
         document.getElementById('creator-profile-content').innerHTML = `
@@ -529,7 +518,7 @@ class URLSApp {
                     <div class="profile-stats">
                         <div class="profile-stat"><strong>${data.totalPoints.toFixed(2)}</strong> Creator Points</div>
                         <div class="profile-stat"><strong>#${data.posPoints || '-'}</strong> Points Rank</div>
-                        <div class="profile-stat"><strong>${data.totalLevels}</strong> Total Maps</div>
+                        <div class="profile-checked"><strong>${data.totalLevels}</strong> Total Maps</div>
                         <div class="profile-stat"><strong>#${data.posTotal || '-'}</strong> Maps Rank</div>
                         <div class="profile-stat"><strong>${data.speedrunCount}</strong> Speedrun</div>
                         <div class="profile-stat"><strong>${data.hardCount}</strong> Hard</div>
@@ -541,8 +530,8 @@ class URLSApp {
                 <div class="filter-bar">
                     <input type="text" id="creator-search" placeholder="Search…">
                     <div class="sort-btns">
-                        <button data-type="creator" data-sort="recent" class="sort-btn"><i class="fas fa-clock"></i> Recent</button>
-                        <button data-type="creator" data-sort="rated" class="sort-btn active"><i class="fas fa-star"></i> Rating</button>
+                        <button data-type="creator" data-sort="recent" class="sort-btn">Recent</button>
+                        <button data-type="creator" data-sort="rated" class="sort-btn active">Rating</button>
                     </div>
                 </div>
                 <div class="levels-grid"></div>
@@ -626,9 +615,22 @@ class URLSApp {
         });
 
         this.observeNewCards();
+        this.triggerInitialAnimations();
     }
 
-    // NEW: Centralized scroll animation with observer reuse
+    // NEW: Force animation on visible elements immediately
+    triggerInitialAnimations() {
+        requestAnimationFrame(() => {
+            document.querySelectorAll('.animate-ready').forEach(el => {
+                const rect = el.getBoundingClientRect();
+                const isVisible = rect.top < window.innerHeight && rect.bottom > 0;
+                if (isVisible) {
+                    el.classList.add('animate-in');
+                }
+            });
+        });
+    }
+
     initScrollAnimation() {
         if (this.observer) this.observer.disconnect();
 
@@ -636,7 +638,7 @@ class URLSApp {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
                     entry.target.classList.add('animate-in');
-                    this.observer.unobserve(entry.target); // Optional: animate once
+                    this.observer.unobserve(entry.target);
                 }
             });
         }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
@@ -644,10 +646,7 @@ class URLSApp {
 
     observeNewCards() {
         if (!this.observer) this.initScrollAnimation();
-
-        // Observe all animatable elements
         document.querySelectorAll('.animate-ready').forEach(el => {
-            // Reset in case it was partially animated
             el.classList.remove('animate-in');
             this.observer.observe(el);
         });
