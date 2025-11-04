@@ -13,6 +13,7 @@ class URLSApp {
             hard: { search: '', sort: 'rated' },
             creator: { search: '', sort: 'rated' }
         };
+        this.observer = null; // Store observer reference
         this.init();
     }
 
@@ -23,7 +24,7 @@ class URLSApp {
         this.calculateLeaderboard();
         this.render();
         this.bindEvents();
-        this.animateOnScroll();
+        this.initScrollAnimation(); // Use new method
     }
 
     async loadData() {
@@ -203,6 +204,9 @@ class URLSApp {
         else if (p === 'speedrun' || p === 'hard') this.renderLevels(p);
         else if (p === 'faq') this.renderFAQ();
         this.currentPage = p;
+
+        // Re-apply scroll animations after page switch
+        setTimeout(() => this.observeNewCards(), 100);
     }
 
     renderFAQ() {
@@ -287,6 +291,7 @@ class URLSApp {
                 </p>
             </div>
         `;
+        this.observeNewCards(); // Animate FAQ sections
     }
 
     filterSort(type, search, sort) {
@@ -322,7 +327,7 @@ class URLSApp {
             const rankIcon = rank ? `<img src="${this.getRankIcon(rank)}" class="rank-badge" alt="${rank} rank">` : '';
             const profile = this.profiles.get(l.creator) || { avatar: 'thumbs/default-avatar.png' };
             return `
-                <div class="level-card" data-id="${l.id}" data-type="${type}" tabindex="0">
+                <div class="level-card animate-ready" data-id="${l.id}" data-type="${type}" tabindex="0">
                     <img src="${l.thumbnail}" alt="${l.name}" loading="lazy">
                     <div class="level-info">
                         <h3>${l.name}</h3>
@@ -341,6 +346,11 @@ class URLSApp {
             `;
         }).join('');
 
+        this.bindCardEvents(container);
+        this.observeNewCards();
+    }
+
+    bindCardEvents(container) {
         container.querySelectorAll('.level-card').forEach(card => {
             card.addEventListener('click', e => {
                 if (e.target.classList.contains('creator-link')) return;
@@ -492,7 +502,7 @@ class URLSApp {
                 const rank = l.type === 'speedrun' ? this.getRank(ratings) : null;
                 const rankIcon = rank ? `<img src="${this.getRankIcon(rank)}" class="rank-badge" alt="${rank}">` : '';
                 return `
-                    <div class="level-card" data-id="${l.id}" data-type="${l.type}" tabindex="0">
+                    <div class="level-card animate-ready" data-id="${l.id}" data-type="${l.type}" tabindex="0">
                         <img src="${l.thumbnail}" alt="${l.name}" loading="lazy">
                         <div class="level-info">
                             <h3>${l.name}</h3>
@@ -506,15 +516,8 @@ class URLSApp {
                     </div>
                 `;
             }).join('');
-            grid.querySelectorAll('.level-card').forEach(c => {
-                c.addEventListener('click', () => this.showLevelPage(c.dataset.type, c.dataset.id));
-                c.addEventListener('keydown', e => {
-                    if (e.key === 'Enter' || e.key === ' ') {
-                        e.preventDefault();
-                        this.showLevelPage(c.dataset.type, c.dataset.id);
-                    }
-                });
-            });
+            this.bindCardEvents(grid);
+            this.observeNewCards();
         };
 
         document.getElementById('creator-profile-content').innerHTML = `
@@ -596,7 +599,7 @@ class URLSApp {
             else if (type === 'hard') value = `${d.hardCount} Hard`;
 
             return `
-                <div class="leaderboard-card" data-creator="${name}" tabindex="0">
+                <div class="leaderboard-card animate-ready" data-creator="${name}" tabindex="0">
                     <img src="${profile.banner}" class="leaderboard-banner" alt="${name}'s banner" loading="lazy">
                     <div class="leaderboard-content">
                         <div class="leaderboard-info">
@@ -621,28 +624,39 @@ class URLSApp {
                 }
             });
         });
+
+        this.observeNewCards();
+    }
+
+    // NEW: Centralized scroll animation with observer reuse
+    initScrollAnimation() {
+        if (this.observer) this.observer.disconnect();
+
+        this.observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('animate-in');
+                    this.observer.unobserve(entry.target); // Optional: animate once
+                }
+            });
+        }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+    }
+
+    observeNewCards() {
+        if (!this.observer) this.initScrollAnimation();
+
+        // Observe all animatable elements
+        document.querySelectorAll('.animate-ready').forEach(el => {
+            // Reset in case it was partially animated
+            el.classList.remove('animate-in');
+            this.observer.observe(el);
+        });
     }
 
     render() {
         this.renderLevels('speedrun');
         this.renderLevels('hard');
         this.renderLeaderboard();
-    }
-
-    // Scroll Animations
-    animateOnScroll() {
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('animate-in');
-                }
-            });
-        }, { threshold: 0.1 });
-
-        document.querySelectorAll('.level-card, .leaderboard-card, .team-member, .faq-section').forEach(el => {
-            el.classList.add('animate-ready');
-            observer.observe(el);
-        });
     }
 }
 
