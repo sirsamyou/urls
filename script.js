@@ -24,8 +24,8 @@ class URLSApp {
         this.calculateLeaderboard();
         this.render();
         this.bindEvents();
-        this.initScrollAnimation(); // kept only for leaderboard cards if needed
-        this.applyInitialVisibility(); // Now triggers shiny + instant visibility
+        this.initScrollAnimation();
+        this.applyInitialVisibility();
     }
 
     async loadData() {
@@ -42,7 +42,7 @@ class URLSApp {
         } catch (e) { console.error('Profiles load error:', e); }
     }
 
-    getRank(total) {
+    getRank(total, isHard = false) {
         if (total < 10) return null;
         if (total < 18) return 'normal';
         if (total < 23) return 'epic';
@@ -50,9 +50,10 @@ class URLSApp {
         return 'mythic';
     }
 
-    getRankIcon(rank) {
+    getRankIcon(rank, isHard = false) {
         if (!rank) return '';
-        return `assets/${rank}ranking.png`;
+        const suffix = isHard ? 'hard' : '';
+        return `assets/${rank}ranking${suffix}.png`;
     }
 
     formatRating(num) {
@@ -76,7 +77,7 @@ class URLSApp {
                 sum = lvl.ratings.gameplay + lvl.ratings.design + lvl.ratings.speedrunning;
                 data.speedrunCount++;
             } else {
-                sum = lvl.ratings.speedrun + lvl.ratings.design + lvl.ratings.difficulty;
+                sum = lvl.ratings.gameplay + lvl.ratings.design + lvl.ratings.balancing;
                 data.hardCount++;
             }
             data.totalPoints += sum / 10;
@@ -167,7 +168,7 @@ class URLSApp {
 
         document.getElementById('random-hard-btn')?.addEventListener('click', () => {
             const rated = this.hardLevels.filter(l => {
-                const total = l.ratings.speedrun + l.ratings.design + l.ratings.difficulty;
+                const total = l.ratings.gameplay + l.ratings.design + l.ratings.balancing;
                 return total >= 10;
             });
             if (rated.length === 0) return;
@@ -207,7 +208,7 @@ class URLSApp {
         document.getElementById('faq-content').innerHTML = `
             <h1>URLS – Unofficial Rating Levels System</h1>
             <div class="faq-intro">
-                <p><strong>URLS</strong> is an <strong>Unofficial Rating Levels System</strong> for community-made levels. Our team of raters evaluates submissions based on gameplay, design, and speedrunning potential (or difficulty for hard levels).</p>
+                <p><strong>URLS</strong> is an <strong>Unofficial Rating Levels System</strong> for community-made levels. Our team of raters evaluates submissions based on gameplay, design, and speedrunning potential (or balancing for hard levels).</p>
             </div>
             <div class="faq-section">
                 <h3>Speedrun Level Rating</h3>
@@ -219,13 +220,26 @@ class URLSApp {
                 </ul>
             </div>
             <div class="faq-section">
+                <h3>Hard Level Rating</h3>
+                <p>Hard levels are rated on three aspects:</p>
+                <ul>
+                    <li><strong>Gameplay:</strong> How fun and engaging the challenge is (0–10)</li>
+                    <li><strong>Design:</strong> Visuals, layout, creativity (0–10)</li>
+                    <li><strong>Balancing:</strong> How fair and well-tuned the difficulty is (0–10)</li>
+                </ul>
+            </div>
+            <div class="faq-section">
                 <h3>Rank System</h3>
                 <p>Only levels with <strong>10+ total points</strong> are ranked:</p>
                 <ul>
-                    <li><img src="assets/normalranking.png" alt="Normal"> <strong>Normal:</strong> 10 – 17.9 / 30</li>
+                    <li><img src="assets/normalranking.png" alt="Normal"> <strong>Normal:</strong> 10 – 17.9 / 30 (Speedrun)</li>
+                    <li><img src="assets/normalrankinghard.png" alt="Normal Hard"> <strong>Normal:</strong> 10 – 17.9 / 30 (Hard)</li>
                     <li><img src="assets/epicranking.png" alt="Epic"> <strong>Epic:</strong> 18 – 22.9 / 30</li>
+                    <li><img src="assets/epicrankinghard.png" alt="Epic Hard"> <strong>Epic:</strong> 18 – 22.9 / 30 (Hard)</li>
                     <li><img src="assets/legendaryranking.png" alt="Legendary"> <strong>Legendary:</strong> 23 – 26.9 / 30</li>
+                    <li><img src="assets/legendaryrankinghard.png" alt="Legendary Hard"> <strong>Legendary:</strong> 23 – 26.9 / 30 (Hard)</li>
                     <li><img src="assets/mythicranking.png" alt="Mythic"> <strong>Mythic:</strong> 27+ / 30</li>
+                    <li><img src="assets/mythicrankinghard.png" alt="Mythic Hard"> <strong>Mythic:</strong> 27+ / 30 (Hard)</li>
                 </ul>
             </div>
             <div class="faq-section">
@@ -233,10 +247,6 @@ class URLSApp {
                 <p>Every <strong>10 rating points</strong> a level earns = <strong>1 Creator Point</strong>.</p>
                 <p><strong>Example:</strong> A level rated <strong>14/30</strong> gives <strong>1.4 Creator Points</strong>.</p>
                 <p>These points are used in the <strong>Creator Points Leaderboard</strong>.</p>
-            </div>
-            <div class="faq-section">
-                <h3>Hard Levels</h3>
-                <p>Hard levels use the old system (Speedrun, Design, Difficulty) for now.</p>
             </div>
             <div class="faq-section">
                 <h3>Team</h3>
@@ -286,8 +296,12 @@ class URLSApp {
         if (search) list = list.filter(l => l.name.toLowerCase().includes(search.toLowerCase()) || l.creator.toLowerCase().includes(search.toLowerCase()));
         if (sort === 'rated') {
             list.sort((a, b) => {
-                const avgA = Object.values(a.ratings).reduce((s, v) => s + v, 0) / 3;
-                const avgB = Object.values(b.ratings).reduce((s, v) => s + v, 0) / 3;
+                const avgA = type === 'speedrun'
+                    ? (a.ratings.gameplay + a.ratings.design + a.ratings.speedrunning) / 3
+                    : (a.ratings.gameplay + a.ratings.design + a.ratings.balancing) / 3;
+                const avgB = type === 'speedrun'
+                    ? (b.ratings.gameplay + b.ratings.design + b.ratings.speedrunning) / 3
+                    : (b.ratings.gameplay + b.ratings.design + b.ratings.balancing) / 3;
                 return avgB - avgA;
             });
         } else {
@@ -309,11 +323,13 @@ class URLSApp {
         const grid = container.closest('.levels-grid') || container;
 
         container.innerHTML = levels.map(l => {
-            const ratings = type === 'speedrun'
-                ? this.formatRating(l.ratings.gameplay + l.ratings.design + l.ratings.speedrunning)
-                : this.formatRating(l.ratings.speedrun + l.ratings.design + l.ratings.difficulty);
-            const rank = type === 'speedrun' ? this.getRank(ratings) : null;
-            const rankIcon = rank ? `<img src="${this.getRankIcon(rank)}" class="rank-badge" alt="${rank} rank">` : '';
+            const isHard = type === 'hard';
+            const total = isHard
+                ? l.ratings.gameplay + l.ratings.design + l.ratings.balancing
+                : l.ratings.gameplay + l.ratings.design + l.ratings.speedrunning;
+            const ratings = this.formatRating(total);
+            const rank = this.getRank(ratings, isHard);
+            const rankIcon = rank ? `<img src="${this.getRankIcon(rank, isHard)}" class="rank-badge" alt="${rank} rank">` : '';
             const profile = this.profiles.get(l.creator) || { avatar: 'thumbs/default-avatar.png' };
             return `
                 <div class="level-card" data-id="${l.id}" data-type="${type}" tabindex="0">
@@ -336,10 +352,8 @@ class URLSApp {
         }).join('');
 
         this.bindCardEvents(container);
-
-        // === SHINY SWEEP EFFECT + INSTANT VISIBILITY ===
         this.triggerShinySweep(grid);
-        this.applyInitialVisibility(); // ensures no card stays opacity:0
+        this.applyInitialVisibility();
         this.observeNewCards();
     }
 
@@ -361,15 +375,11 @@ class URLSApp {
         }));
     }
 
-    // NEW: Shiny sweep trigger (used for level grids & creator grids)
     triggerShinySweep(gridElement) {
         if (!gridElement) return;
         gridElement.classList.remove('shiny-active');
-        // Force reflow to restart animation
         void gridElement.offsetWidth;
         gridElement.classList.add('shiny-active');
-
-        // Clean up after animation
         const cleanup = () => {
             gridElement.classList.remove('shiny-active');
             gridElement.removeEventListener('animationend', cleanup);
@@ -382,17 +392,18 @@ class URLSApp {
         const lvl = list.find(l => l.id == id);
         if (!lvl) return;
 
+        const isHard = type === 'hard';
         const profile = this.profiles.get(lvl.creator) || { avatar: 'thumbs/default-avatar.png' };
 
         let total, rank, rankIcon;
-        if (type === 'speedrun') {
+        if (isHard) {
+            total = this.formatRating(lvl.ratings.gameplay + lvl.ratings.design + lvl.ratings.balancing);
+            rank = this.getRank(total, true);
+            rankIcon = rank ? `<img src="${this.getRankIcon(rank, true)}" alt="${rank}">` : '';
+        } else {
             total = this.formatRating(lvl.ratings.gameplay + lvl.ratings.design + lvl.ratings.speedrunning);
             rank = this.getRank(total);
             rankIcon = rank ? `<img src="${this.getRankIcon(rank)}" alt="${rank}">` : '';
-        } else {
-            total = this.formatRating(lvl.ratings.speedrun + lvl.ratings.design + lvl.ratings.difficulty);
-            rank = null;
-            rankIcon = '';
         }
 
         document.getElementById('level-detail-content').innerHTML = `
@@ -406,12 +417,10 @@ class URLSApp {
                 </div>
                 <p><strong>Created:</strong> ${new Date(lvl.created).toLocaleDateString()}</p>
 
-                ${type === 'speedrun' ? `
                 <div class="total-score">
                     ${rankIcon}
                     <span>${total}/30</span>
                 </div>
-                ` : ''}
 
                 <div class="level-id-bar">
                     <span class="id-label">ID:</span>
@@ -426,7 +435,20 @@ class URLSApp {
 
                 <div class="ratings">
                     <h3>Ratings</h3>
-                    ${type === 'speedrun' ? `
+                    ${isHard ? `
+                    <div class="rating-item">
+                        <span>Gameplay</span>
+                        <span class="rating-value">${this.formatRating(lvl.ratings.gameplay)}/10</span>
+                    </div>
+                    <div class="rating-item">
+                        <span>Design</span>
+                        <span class="rating-value">${this.formatRating(lvl.ratings.design)}/10</span>
+                    </div>
+                    <div class="rating-item">
+                        <span>Balancing</span>
+                        <span class="rating-value">${this.formatRating(lvl.ratings.balancing)}/10</span>
+                    </div>
+                    ` : `
                     <div class="rating-item">
                         <span>Gameplay</span>
                         <span class="rating-value">${this.formatRating(lvl.ratings.gameplay)}/10</span>
@@ -438,19 +460,6 @@ class URLSApp {
                     <div class="rating-item">
                         <span>Speedrunning</span>
                         <span class="rating-value">${this.formatRating(lvl.ratings.speedrunning)}/10</span>
-                    </div>
-                    ` : `
-                    <div class="rating-item">
-                        <span>Speedrun</span>
-                        <span class="rating-value">${this.formatRating(lvl.ratings.speedrun)}/10</span>
-                    </div>
-                    <div class="rating-item">
-                        <span>Design</span>
-                        <span class="rating-value">${this.formatRating(lvl.ratings.design)}/10</span>
-                    </div>
-                    <div class="rating-item">
-                        <span>Difficulty</span>
-                        <span class="rating-value">${this.formatRating(lvl.ratings.difficulty)}/10</span>
                     </div>
                     `}
                 </div>
@@ -496,8 +505,12 @@ class URLSApp {
             let filtered = levels.filter(l => l.name.toLowerCase().includes(search.toLowerCase()));
             if (sort === 'rated') {
                 filtered.sort((a, b) => {
-                    const avgA = Object.values(a.ratings).reduce((s, v) => s + v, 0) / 3;
-                    const avgB = Object.values(b.ratings).reduce((s, v) => s + v, 0) / 3;
+                    const avgA = a.type === 'speedrun'
+                        ? (a.ratings.gameplay + a.ratings.design + a.ratings.speedrunning) / 3
+                        : (a.ratings.gameplay + a.ratings.design + a.ratings.balancing) / 3;
+                    const avgB = b.type === 'speedrun'
+                        ? (b.ratings.gameplay + b.ratings.design + b.ratings.speedrunning) / 3
+                        : (b.ratings.gameplay + b.ratings.design + b.ratings.balancing) / 3;
                     return avgB - avgA;
                 });
             } else {
@@ -505,11 +518,13 @@ class URLSApp {
             }
             const grid = document.querySelector('#creator-profile-content .levels-grid');
             grid.innerHTML = filtered.map(l => {
-                const ratings = l.type === 'speedrun'
-                    ? this.formatRating(l.ratings.gameplay + l.ratings.design + l.ratings.speedrunning)
-                    : this.formatRating(l.ratings.speedrun + l.ratings.design + l.ratings.difficulty);
-                const rank = l.type === 'speedrun' ? this.getRank(ratings) : null;
-                const rankIcon = rank ? `<img src="${this.getRankIcon(rank)}" class="rank-badge" alt="${rank}">` : '';
+                const isHard = l.type === 'hard';
+                const total = isHard
+                    ? l.ratings.gameplay + l.ratings.design + l.ratings.balancing
+                    : l.ratings.gameplay + l.ratings.design + l.ratings.speedrunning;
+                const ratings = this.formatRating(total);
+                const rank = this.getRank(ratings, isHard);
+                const rankIcon = rank ? `<img src="${this.getRankIcon(rank, isHard)}" class="rank-badge" alt="${rank}">` : '';
                 return `
                     <div class="level-card" data-id="${l.id}" data-type="${l.type}" tabindex="0">
                         <img src="${l.thumbnail}" alt="${l.name}" loading="lazy">
@@ -526,8 +541,6 @@ class URLSApp {
                 `;
             }).join('');
             this.bindCardEvents(grid);
-
-            // Shiny sweep for creator page too
             this.triggerShinySweep(grid);
             this.applyInitialVisibility();
             this.observeNewCards();
@@ -642,16 +655,13 @@ class URLSApp {
         this.observeNewCards();
     }
 
-    // UPDATED: No more opacity:0 on load → all cards visible instantly + shiny sweep
     applyInitialVisibility() {
         requestAnimationFrame(() => {
             document.querySelectorAll('.level-card').forEach(card => {
                 card.classList.remove('animate-ready', 'animate-in');
-                // Force full visibility
                 card.style.opacity = '1';
                 card.style.transform = 'none';
             });
-            // Leaderboard cards keep subtle scroll animation (optional)
             document.querySelectorAll('.leaderboard-card').forEach(card => {
                 const rect = card.getBoundingClientRect();
                 const isVisible = rect.top < window.innerHeight && rect.bottom > 0;
