@@ -28,15 +28,23 @@ class URLSApp {
     }
 
     async loadData() {
+        const proxy = 'https://api.allorigins.ml/get?method=raw&url=';
         try {
-            this.speedrunLevels = await fetch('speedrun-levels.json').then(r => r.json());
-            this.hardLevels = await fetch('hard-levels.json').then(r => r.json());
-        } catch (e) { console.error('Load error:', e); }
+            const speedrunUrl = `${proxy}${encodeURIComponent('https://urls.gd/speedrun-levels.json')}`;
+            const hardUrl = `${proxy}${encodeURIComponent('https://urls.gd/hard-levels.json')}`;
+            this.speedrunLevels = await fetch(speedrunUrl).then(r => r.json());
+            this.hardLevels = await fetch(hardUrl).then(r => r.json());
+        } catch (e) {
+            console.error('Load error:', e);
+            document.body.insertAdjacentHTML('beforeend', '<div style="color:red;padding:2rem;text-align:center;">Failed to load levels. Check console or try again later.</div>');
+        }
     }
 
     async loadProfiles() {
+        const proxy = 'https://api.allorigins.ml/get?method=raw&url=';
         try {
-            const data = await fetch('profiles.json').then(r => r.json());
+            const url = `${proxy}${encodeURIComponent('https://urls.gd/profiles.json')}`;
+            const data = await fetch(url).then(r => r.json());
             data.forEach(p => this.profiles.set(p.name, { avatar: p.avatar, banner: p.banner }));
         } catch (e) { console.error('Profiles load error:', e); }
     }
@@ -78,10 +86,8 @@ class URLSApp {
             }
             const data = this.creators.get(c);
             data.levels.push(lvl);
-
             const sum = this.getTotalRating(lvl);
             data.totalPoints += sum / 10;
-
             if (lvl.type === 'speedrun') data.speedrunCount++;
             else data.hardCount++;
         });
@@ -223,10 +229,10 @@ class URLSApp {
                 <h3>Rank System (Both Types)</h3>
                 <p>Only levels with <strong>10+ total points</strong> are ranked:</p>
                 <ul>
-                    <li><img src="assets/normalranking.png" alt=""> <strong>Normal:</strong> 10–17.9 (Speedrun) | <img src="assets/normalrankinghard.png" alt=""> (Hard)</li>
-                    <li><img src="assets/epicranking.png" alt=""> <strong>Epic:</strong> 18–22.9 | <img src="assets/epicrankinghard.png" alt=""> (Hard)</li>
-                    <li><img src="assets/legendaryranking.png" alt=""> <strong>Legendary:</strong> 23–26.9 | <img src="assets/legendaryrankinghard.png" alt=""> (Hard)</li>
-                    <li><img src="assets/mythicranking.png" alt=""> <strong>Mythic:</strong> 27+ | <img src="assets/mythicrankinghard.png" alt=""> (Hard)</li>
+                    <li><img src="assets/normalranking.png" alt="" class="rank-badge"> <strong>Normal:</strong> 10–17.9 (Speedrun) | <img src="assets/normalrankinghard.png" alt="" class="rank-badge"> (Hard)</li>
+                    <li><img src="assets/epicranking.png" alt="" class="rank-badge"> <strong>Epic:</strong> 18–22.9 | <img src="assets/epicrankinghard.png" alt="" class="rank-badge"> (Hard)</li>
+                    <li><img src="assets/legendaryranking.png" alt="" class="rank-badge"> <strong>Legendary:</strong> 23–26.9 | <img src="assets/legendaryrankinghard.png" alt="" class="rank-badge"> (Hard)</li>
+                    <li><img src="assets/mythicranking.png" alt="" class="rank-badge"> <strong>Mythic:</strong> 27+ | <img src="assets/mythicrankinghard.png" alt="" class="rank-badge"> (Hard)</li>
                 </ul>
             </div>
 
@@ -299,8 +305,6 @@ class URLSApp {
         this.observeNewCards();
     }
 
-    // ... (rest of methods unchanged except showLevelPage)
-
     showLevelPage(type, id) {
         const list = type === 'speedrun' ? this.speedrunLevels : this.hardLevels;
         const lvl = list.find(l => l.id == id);
@@ -309,7 +313,7 @@ class URLSApp {
         const total = this.formatRating(this.getTotalRating(lvl));
         const rank = this.getRank(total);
         const isHard = type === 'hard';
-        const rankIcon = rank ? `<img src="${this.getRankIcon(rank, isHard)}" alt="${rank}">` : '';
+        const rankIcon = rank ? `<img src="${this.getRankIcon(rank, isHard)}" class="rank-badge" alt="${rank}">` : '';
 
         const profile = this.profiles.get(lvl.creator) || { avatar: 'thumbs/default-avatar.png' };
 
@@ -350,13 +354,8 @@ class URLSApp {
             </div>
         `;
 
-        // copy + avatar pulse code same as before
-        // ...
         this.switchPage('level-detail-page');
     }
-
-    // rest of class unchanged (renderLeaderboard, showCreatorPage, etc.)
-    // just make sure to use getTotalRating() and getRankIcon(..., isHard)
 
     applyInitialVisibility() {
         requestAnimationFrame(() => {
