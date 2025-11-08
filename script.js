@@ -24,8 +24,8 @@ class URLSApp {
         this.calculateLeaderboard();
         this.render();
         this.bindEvents();
-        this.initScrollAnimation();
-        this.applyInitialVisibility(); // NEW: Show all on load
+        this.initScrollAnimation(); // kept only for leaderboard cards if needed
+        this.applyInitialVisibility(); // Now triggers shiny + instant visibility
     }
 
     async loadData() {
@@ -306,6 +306,8 @@ class URLSApp {
 
     renderList(type, levels) {
         const container = document.getElementById(type === 'speedrun' ? 'speedrun-list' : 'hard-list');
+        const grid = container.closest('.levels-grid') || container;
+
         container.innerHTML = levels.map(l => {
             const ratings = type === 'speedrun'
                 ? this.formatRating(l.ratings.gameplay + l.ratings.design + l.ratings.speedrunning)
@@ -334,7 +336,10 @@ class URLSApp {
         }).join('');
 
         this.bindCardEvents(container);
-        this.applyInitialVisibility();
+
+        // === SHINY SWEEP EFFECT + INSTANT VISIBILITY ===
+        this.triggerShinySweep(grid);
+        this.applyInitialVisibility(); // ensures no card stays opacity:0
         this.observeNewCards();
     }
 
@@ -354,6 +359,22 @@ class URLSApp {
         container.querySelectorAll('.creator-link').forEach(l => l.addEventListener('click', e => {
             e.stopPropagation(); this.showCreatorPage(e.target.dataset.creator);
         }));
+    }
+
+    // NEW: Shiny sweep trigger (used for level grids & creator grids)
+    triggerShinySweep(gridElement) {
+        if (!gridElement) return;
+        gridElement.classList.remove('shiny-active');
+        // Force reflow to restart animation
+        void gridElement.offsetWidth;
+        gridElement.classList.add('shiny-active');
+
+        // Clean up after animation
+        const cleanup = () => {
+            gridElement.classList.remove('shiny-active');
+            gridElement.removeEventListener('animationend', cleanup);
+        };
+        gridElement.addEventListener('animationend', cleanup);
     }
 
     showLevelPage(type, id) {
@@ -505,6 +526,9 @@ class URLSApp {
                 `;
             }).join('');
             this.bindCardEvents(grid);
+
+            // Shiny sweep for creator page too
+            this.triggerShinySweep(grid);
             this.applyInitialVisibility();
             this.observeNewCards();
         };
@@ -618,10 +642,17 @@ class URLSApp {
         this.observeNewCards();
     }
 
-    // NEW: Show visible cards immediately, animate only off-screen ones
+    // UPDATED: No more opacity:0 on load → all cards visible instantly + shiny sweep
     applyInitialVisibility() {
         requestAnimationFrame(() => {
-            document.querySelectorAll('.level-card, .leaderboard-card').forEach(card => {
+            document.querySelectorAll('.level-card').forEach(card => {
+                card.classList.remove('animate-ready', 'animate-in');
+                // Force full visibility
+                card.style.opacity = '1';
+                card.style.transform = 'none';
+            });
+            // Leaderboard cards keep subtle scroll animation (optional)
+            document.querySelectorAll('.leaderboard-card').forEach(card => {
                 const rect = card.getBoundingClientRect();
                 const isVisible = rect.top < window.innerHeight && rect.bottom > 0;
                 if (isVisible) {
