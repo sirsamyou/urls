@@ -1,4 +1,4 @@
-// script.js 
+// script.js
 class URLSApp {
     constructor() {
         this.speedrunLevels = [];
@@ -17,6 +17,7 @@ class URLSApp {
     }
 
     async init() {
+        this.showLoading();
         await this.loadData();
         await this.loadProfiles();
         this.aggregateCreators();
@@ -25,27 +26,44 @@ class URLSApp {
         this.bindEvents();
         this.initScrollAnimation();
         this.applyInitialVisibility();
+        this.hideLoading();
+    }
+
+    showLoading() {
+        document.querySelectorAll('.levels-grid, #leaderboard-list').forEach(container => {
+            container.innerHTML = Array(12).fill().map(() => `<div class="level-card skeleton"></div>`).join('');
+        });
+        document.getElementById('leaderboard-list').innerHTML = Array(20).fill().map(() => `<div class="leaderboard-card skeleton"></div>`).join('');
+    }
+
+    hideLoading() {
+        document.querySelectorAll('.skeleton').forEach(el => el.remove());
     }
 
     async loadData() {
-        const proxy = 'https://api.allorigins.ml/get?method=raw&url=';
+        const proxy = 'https://api.allorigins.win/raw?url='; // Reliable 2025 proxy (fallback-ready)
         try {
             const speedrunUrl = `${proxy}${encodeURIComponent('https://urls.gd/speedrun-levels.json')}`;
             const hardUrl = `${proxy}${encodeURIComponent('https://urls.gd/hard-levels.json')}`;
-            this.speedrunLevels = await fetch(speedrunUrl).then(r => r.json());
-            this.hardLevels = await fetch(hardUrl).then(r => r.json());
+            const [speedrunRes, hardRes] = await Promise.all([
+                fetch(speedrunUrl),
+                fetch(hardUrl)
+            ]);
+            if (!speedrunRes.ok || !hardRes.ok) throw new Error('Network error');
+            this.speedrunLevels = await speedrunRes.json();
+            this.hardLevels = await hardRes.json();
         } catch (e) {
             console.error('Load error:', e);
-            document.body.insertAdjacentHTML('beforeend', '<div style="color:red;padding:2rem;text-align:center;">Failed to load levels. Check console or try again later.</div>');
+            document.body.insertAdjacentHTML('beforeend', '<div style="color:red;padding:2rem;text-align:center;background:#200;border:1px solid #500;">Failed to load levels. Try refreshing or check <a href="https://api.allorigins.win" style="color:#00c6ff;">proxy status</a>. Error: ' + e.message + '</div>');
         }
     }
 
     async loadProfiles() {
-        const proxy = 'https://api.allorigins.ml/get?method=raw&url=';
+        const proxy = 'https://api.allorigins.win/raw?url=';
         try {
             const url = `${proxy}${encodeURIComponent('https://urls.gd/profiles.json')}`;
             const data = await fetch(url).then(r => r.json());
-            data.forEach(p => this.profiles.set(p.name, { avatar: p.avatar, banner: p.banner }));
+            data.forEach(p => this.profiles.set(p.name, { avatar: p.avatar, banner: p.banner || 'assets/default-banner.jpg' }));
         } catch (e) { console.error('Profiles load error:', e); }
     }
 
@@ -112,7 +130,7 @@ class URLSApp {
     bindEvents() {
         document.getElementById('urls-logo').addEventListener('click', e => {
             e.preventDefault();
-            this.switchPage('faq');
+            this.switchPage('speedrun'); // Fixed: Logo now goes to home (speedrun)
         });
 
         document.querySelector('.hamburger').addEventListener('click', () => {
@@ -156,7 +174,7 @@ class URLSApp {
             if (el) el.addEventListener('input', e => {
                 const sort = this.filterState[type].sort;
                 this.filterState[type].search = e.target.value;
-                this.filterSort(type, e.target.value, sort);
+                this.filterSort(type, e.target.value, ish);
             });
         });
 
@@ -174,6 +192,7 @@ class URLSApp {
             this.showLevelPage('hard', random.id);
         });
 
+        // Creator search for profile (future-proof)
         document.body.addEventListener('input', e => {
             if (e.target.id === 'creator-search') {
                 this.renderCreatorLevels(e.target.value, this.filterState.creator.sort);
@@ -273,6 +292,22 @@ class URLSApp {
         });
     }
 
+    bindCardEvents(container) {
+        container.querySelectorAll('.level-card').forEach(card => {
+            card.addEventListener('click', () => {
+                const type = card.dataset.type;
+                const id = card.dataset.id;
+                this.showLevelPage(type, id);
+            });
+        });
+        container.querySelectorAll('.creator-link').forEach(link => {
+            link.addEventListener('click', e => {
+                e.stopPropagation();
+                this.showCreatorProfile(link.dataset.creator);
+            });
+        });
+    }
+
     renderList(type, levels) {
         const container = document.getElementById(type === 'speedrun' ? 'speedrun-list' : 'hard-list');
         container.innerHTML = levels.map(l => {
@@ -322,8 +357,8 @@ class URLSApp {
             <div class="level-detail-info">
                 <h1>${lvl.name}</h1>
                 <div class="creator-info" style="margin:1rem 0;">
-                    <img src="${profile.avatar}" alt="${lvl.creator}" class="avatar-click" style="width:36px;height:36px;">
-                    <span class="creator-link" data-creator="${lvl.creator}">${lvl.creator}</span>
+                    <img src="${profile.avatar}" alt="${lvl.creator}" class="avatar-click" style="width:36px;height:36px;cursor:pointer;" data-creator="${lvl.creator}">
+                    <span class="creator-link" data-creator="${lvl.creator}" style="cursor:pointer;">${lvl.creator}</span>
                 </div>
                 <p><strong>Created:</strong> ${new Date(lvl.created).toLocaleDateString()}</p>
 
@@ -335,7 +370,7 @@ class URLSApp {
                 <div class="level-id-bar">
                     <span class="id-label">ID:</span>
                     <input type="text" value="${lvl.id}" readonly>
-                    <button class="copy-btn"><i class="fas fa-copy"></i> <span>Copy</span></button>
+                    <button class="copy-btn" data-clipboard="${lvl.id}"><i class="fas fa-copy"></i> <span>Copy</span></button>
                     <a href="${lvl.link}" target="_blank" class="play-btn"><i class="fas fa-play"></i> Play</a>
                 </div>
 
@@ -354,7 +389,169 @@ class URLSApp {
             </div>
         `;
 
+        // Bind copy button
+        document.querySelectorAll('.copy-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                navigator.clipboard.writeText(btn.dataset.clipboard);
+                btn.querySelector('span').textContent = 'Copied!';
+                setTimeout(() => btn.querySelector('span').textContent = 'Copy', 2000);
+            });
+        });
+
+        // Creator click in detail
+        document.querySelectorAll('[data-creator]').forEach(el => {
+            el.addEventListener('click', () => this.showCreatorProfile(el.dataset.creator));
+        });
+
         this.switchPage('level-detail-page');
+    }
+
+    showCreatorProfile(creatorName) {
+        const data = this.creators.get(creatorName);
+        if (!data) return;
+        const profile = this.profiles.get(creatorName) || { avatar: 'thumbs/default-avatar.png', banner: 'assets/default-banner.jpg' };
+
+        const allLevels = data.levels;
+        const sortedLevels = [...allLevels].sort((a, b) => this.getTotalRating(b) - this.getTotalRating(a));
+
+        document.getElementById('creator-profile-content').innerHTML = `
+            <div class="creator-banner" style="background-image:url('${profile.banner}');"></div>
+            <div class="creator-header">
+                <img src="${profile.avatar}" alt="${creatorName}" class="creator-avatar-large">
+                <h1>${creatorName}</h1>
+                <p><strong>Total Levels:</strong> ${data.totalLevels} | <strong>Points:</strong> ${data.totalPoints.toFixed(1)}</p>
+            </div>
+            <div class="creator-stats">
+                <div><strong>Speedrun Maps:</strong> ${data.speedrunCount} (#${data.posSpeedrun || '-'})</div>
+                <div><strong>Hard Maps:</strong> ${data.hardCount} (#${data.posHard || '-'})</div>
+                <div><strong>Total Maps Rank:</strong> #${data.posTotal || '-'}</div>
+                <div><strong>Points Rank:</strong> #${data.posPoints || '-'}</div>
+            </div>
+            <h2 style="margin:2rem 0 1rem;">All Levels by ${creatorName}</h2>
+            <div class="filter-bar">
+                <input type="text" id="creator-search" placeholder="Search this creator's levels…">
+                <div class="sort-btns">
+                    <button data-type="creator" data-sort="recent" class="sort-btn"><i class="fas fa-clock"></i> Recent</button>
+                    <button data-type="creator" data-sort="rated" class="sort-btn active"><i class="fas fa-star"></i> Rating</button>
+                </div>
+            </div>
+            <div id="creator-levels-grid" class="levels-grid"></div>
+        `;
+
+        // Initial render
+        this.renderCreatorLevels('', 'rated');
+
+        // Bind search/sort for creator
+        document.getElementById('creator-search').addEventListener('input', e => {
+            this.filterState.creator.search = e.target.value;
+            this.renderCreatorLevels(e.target.value, this.filterState.creator.sort);
+        });
+        document.querySelectorAll('.sort-btn[data-type="creator"]').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.sort-btn[data-type="creator"]').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                this.filterState.creator.sort = btn.dataset.sort;
+                this.renderCreatorLevels(document.getElementById('creator-search').value, btn.dataset.sort);
+            });
+        });
+
+        this.switchPage('creator-profile-page');
+    }
+
+    renderCreatorLevels(search, sort) {
+        const creatorName = document.querySelector('#creator-profile-page .creator-header h1').textContent;
+        const data = this.creators.get(creatorName);
+        if (!data) return;
+
+        let levels = [...data.levels];
+        if (search) levels = levels.filter(l => l.name.toLowerCase().includes(search.toLowerCase()));
+        if (sort === 'rated') {
+            levels.sort((a, b) => this.getTotalRating(b) - this.getTotalRating(a));
+        } else {
+            levels.sort((a, b) => new Date(b.created) - new Date(a.created));
+        }
+
+        const container = document.getElementById('creator-levels-grid');
+        container.innerHTML = levels.map(l => {
+            const total = this.formatRating(this.getTotalRating(l));
+            const rank = this.getRank(total);
+            const isHard = l.type === 'hard';
+            const rankIcon = rank ? `<img src="${this.getRankIcon(rank, isHard)}" class="rank-badge" alt="${rank}">` : '';
+            const profile = this.profiles.get(l.creator) || { avatar: 'thumbs/default-avatar.png' };
+            return `
+                <div class="level-card" data-id="${l.id}" data-type="${l.type}" tabindex="0">
+                    <img src="${l.thumbnail}" alt="${l.name}" loading="lazy">
+                    <div class="level-info">
+                        <h3>${l.name}</h3>
+                        <div class="creator-info">
+                            <img src="${profile.avatar}" alt="${l.creator}">
+                            <span>${l.creator}</span>
+                        </div>
+                        <p><strong>Created:</strong> ${new Date(l.created).toLocaleDateString()}</p>
+                        <div style="display:flex;align-items:center;gap:.5rem;margin-top:.6rem;">
+                            ${rankIcon}
+                            <span style="font-size:.9rem;color:#aaa;">${total}/30</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }).join('');
+
+        this.bindCardEvents(container);
+    }
+
+    renderLeaderboard() {
+        const list = document.getElementById('leaderboard-list');
+        let creators = [...this.creators.entries()];
+
+        let sorted = [];
+        let title = '';
+        switch (this.currentLeaderboard) {
+            case 'points':
+                sorted = creators.sort(([,a],[,b]) => b.totalPoints - a.totalPoints);
+                title = 'Creator Points';
+                break;
+            case 'total':
+                sorted = creators.sort(([,a],[,b]) => b.totalLevels - a.totalLevels);
+                title = 'Total Maps';
+                break;
+            case 'speedrun':
+                sorted = creators.filter(([,d]) => d.speedrunCount > 0).sort(([,a],[,b]) => b.speedrunCount - a.speedrunCount);
+                title = 'Speedrun Maps';
+                break;
+            case 'hard':
+                sorted = creators.filter(([,d]) => d.hardCount > 0).sort(([,a],[,b]) => b.hardCount - a.hardCount);
+                title = 'Hard Maps';
+                break;
+        }
+
+        list.innerHTML = sorted.map(([name, data], i) => {
+            const profile = this.profiles.get(name) || { avatar: 'thumbs/default-avatar.png' };
+            const value = this.currentLeaderboard === 'points' ? data.totalPoints.toFixed(1) :
+                          this.currentLeaderboard === 'total' ? data.totalLevels :
+                          this.currentLeaderboard === 'speedrun' ? data.speedrunCount : data.hardCount;
+            return `
+                <div class="leaderboard-card" tabindex="0">
+                    <div class="lb-rank">#${i + 1}</div>
+                    <img src="${profile.avatar}" alt="${name}">
+                    <div class="lb-info">
+                        <h3 class="creator-link" data-creator="${name}">${name}</h3>
+                        <p>${value} ${this.currentLeaderboard === 'points' ? 'pts' : ''}</p>
+                    </div>
+                </div>
+            `;
+        }).join('');
+
+        // Bind creator clicks
+        list.querySelectorAll('.creator-link').forEach(link => {
+            link.addEventListener('click', e => {
+                e.stopPropagation();
+                this.showCreatorProfile(link.dataset.creator);
+            });
+        });
+
+        this.observeNewCards();
+        this.applyInitialVisibility();
     }
 
     applyInitialVisibility() {
@@ -364,7 +561,7 @@ class URLSApp {
                 card.style.transform = 'none';
             });
             document.querySelectorAll('.leaderboard-card').forEach((card, i) => {
-                card.style.transitionDelay = `${i * 0.1}s`;
+                card.style.transitionDelay = `${i * 0.05}s`;
                 card.classList.add('visible');
             });
         });
@@ -377,12 +574,12 @@ class URLSApp {
                     entry.target.classList.add('visible');
                 }
             });
-        }, { threshold: 0.15 });
+        }, { threshold: 0.1 });
     }
 
     observeNewCards() {
         if (!this.observer) this.initScrollAnimation();
-        document.querySelectorAll('.leaderboard-card:not(.visible)').forEach(el => {
+        document.querySelectorAll('.leaderboard-card:not(.visible), .level-card:not(.visible)').forEach(el => {
             this.observer.observe(el);
         });
     }
@@ -391,6 +588,7 @@ class URLSApp {
         this.renderLevels('speedrun');
         this.renderLevels('hard');
         this.renderLeaderboard();
+        this.renderFAQ();
     }
 }
 
