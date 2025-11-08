@@ -1,16 +1,184 @@
 [
-    {
-        "id": 1746459784135,
-        "name": "the NARROW.",
-        "creator": "Goosey",
-        "thumbnail": "thumbs/the-narrow.png",
-        "created": "2025-05-08",
-        "link": "https://narrowarrow.xyz/levelid=1746459784135",
-        "type": "hard",
-        "ratings": {
-            "speedrun": 8.1,
-            "design": 9.0,
-            "difficulty": 9.5
-        }
+  {
+    "id": "1746714584366",
+    "name": "The NARROW",
+    "creator": "Goosey",
+    "thumbnail": "thumbs/the-narrow.jpg",
+    "link": "https://narrowarrow.xyz/levelid=1746714584366",
+    "created": "Unknown",
+    "type": "hard",
+    "ratings": {
+      "gameplay": 7.27,
+      "design": 7.70,
+      "balancing": 6.23
     }
+  },
+  {
+    "id": "1746380172018",
+    "name": "Lord of chaos",
+    "creator": "Rimai",
+    "thumbnail": "thumbs/lord-of-chaos.jpg",
+    "link": "https://narrowarrow.xyz/levelid=1746380172018",
+    "created": "Unknown",
+    "type": "hard",
+    "ratings": {
+      "gameplay": 4.83,
+      "design": 7.63,
+      "balancing": 6.53
+    }
+  },
+  {
+    "id": "1746177691425",
+    "name": "Matrix",
+    "creator": "RoyalMushroomPL",
+    "thumbnail": "thumbs/matrix.jpg",
+    "link": "https://narrowarrow.xyz/levelid=1746177691425",
+    "created": "Unknown",
+    "type": "hard",
+    "ratings": {
+      "gameplay": 3.85,
+      "design": 4.65,
+      "balancing": 7.00
+    }
+  },
+  {
+    "id": "1746381386158",
+    "name": "Tarnation",
+    "creator": "CollabLevels",
+    "thumbnail": "thumbs/tarnation.jpg",
+    "link": "https://narrowarrow.xyz/levelid=1746381386158",
+    "created": "Unknown",
+    "type": "hard",
+    "ratings": {
+      "gameplay": 5.33,
+      "design": 4.77,
+      "balancing": 6.93
+    }
+  },
+  {
+    "id": "1747524302517",
+    "name": "TOWER OF HEAVEN",
+    "creator": "Siv",
+    "thumbnail": "thumbs/tower-of-heaven.jpg",
+    "link": "https://narrowarrow.xyz/levelid=1747524302517",
+    "created": "Unknown",
+    "type": "hard",
+    "ratings": {
+      "gameplay": 4.37,
+      "design": 7.90,
+      "balancing": 6.63
+    }
+  },
+  {
+    "id": "1746883337513",
+    "name": "Experiment -982-",
+    "creator": "Ripted",
+    "thumbnail": "thumbs/experiment-982.jpg",
+    "link": "https://narrowarrow.xyz/levelid=1746883337513",
+    "created": "Unknown",
+    "type": "hard",
+    "ratings": {
+      "gameplay": 5.30,
+      "design": 4.57,
+      "balancing": 4.20
+    }
+  },
+  {
+    "id": "1746830608111",
+    "name": "Quemodemodum",
+    "creator": "Siv",
+    "thumbnail": "thumbs/quemodemodum.jpg",
+    "link": "https://narrowarrow.xyz/levelid=1746830608111",
+    "created": "Unknown",
+    "type": "hard",
+    "ratings": {
+      "gameplay": 8.17,
+      "design": 5.30,
+      "balancing": 6.63
+    }
+  },
+  {
+    "id": "1746625465164",
+    "name": "medium or hard level",
+    "creator": "Hambadem",
+    "thumbnail": "thumbs/medium-or-hard-level.jpg",
+    "link": "https://narrowarrow.xyz/levelid=1746625465164",
+    "created": "Unknown",
+    "type": "hard",
+    "ratings": {
+      "gameplay": 5.13,
+      "design": 3.83,
+      "balancing": 6.13
+    }
+  },
+  {
+    "id": "1746966022900",
+    "name": "Eurydheke -",
+    "creator": "Siv",
+    "thumbnail": "thumbs/eurydheke.jpg",
+    "link": "https://narrowarrow.xyz/levelid=1746966022900",
+    "created": "Unknown",
+    "type": "hard",
+    "ratings": {
+      "gameplay": 2.80,
+      "design": 4.33,
+      "balancing": 5.83
+    }
+  },
+  {
+    "id": "1746466686751",
+    "name": "Tupitat",
+    "creator": "Rimai",
+    "thumbnail": "thumbs/tupitat.jpg",
+    "link": "https://narrowarrow.xyz/levelid=1746466686751",
+    "created": "Unknown",
+    "type": "hard",
+    "ratings": {
+      "gameplay": 4.60,
+      "design": 3.80,
+      "balancing": 5.00
+    }
+  },
+  {
+    "id": "1749061987859",
+    "name": "Ewet",
+    "creator": "mlemo",
+    "thumbnail": "thumbs/ewet.jpg",
+    "link": "https://narrowarrow.xyz/levelid=1749061987859",
+    "created": "Unknown",
+    "type": "hard",
+    "ratings": {
+      "gameplay": 6.80,
+      "design": 5.40,
+      "balancing": 7.90
+    }
+  },
+  {
+    "id": "1746636901862",
+    "name": "Tea level",
+    "creator": "Siv",
+    "thumbnail": "thumbs/tea-level.jpg",
+    "link": "https://narrowarrow.xyz/levelid=1746636901862",
+    "created": "Unknown",
+    "type": "hard",
+    "ratings": {
+      "gameplay": 7.50,
+      "design": 7.93,
+      "balancing": 6.90
+    }
+  },
+  {
+    "id": "1752435270472",
+    "name": "Amethyst",
+    "creator": "mlemo",
+    "thumbnail": "thumbs/amethyst.jpg",
+    "link": "https://narrowarrow.xyz/levelid=1752435270472",
+    "created": "Unknown",
+    "type": "hard",
+    "ratings": {
+      "gameplay": 7.57,
+      "design": 6.60,
+      "balancing": 8.23
+    }
+  }
 ]
