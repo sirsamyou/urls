@@ -7,6 +7,10 @@
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/brands.min.css">
+    <style>
+        /* Hotfix for Google Forms iframe */
+        iframe { min-height: 1000px; }
+    </style>
 </head>
 <body>
     <header>
@@ -32,13 +36,11 @@
         <!-- Speedrun Page -->
         <section id="speedrun" class="page active">
             <h2>Speedrun Levels</h2>
-
             <div class="random-level-wrapper">
                 <button id="random-speedrun-btn" class="random-btn" aria-label="Random Rated Speedrun Level">
                     <i class="fas fa-dice"></i>
                 </button>
             </div>
-
             <div class="filter-bar">
                 <input type="text" id="speedrun-search" placeholder="Search levels or creators…">
                 <div class="sort-btns">
@@ -52,13 +54,11 @@
         <!-- Hard Page -->
         <section id="hard" class="page">
             <h2>Hard Levels</h2>
-
             <div class="random-level-wrapper">
                 <button id="random-hard-btn" class="random-btn" aria-label="Random Rated Hard Level">
                     <i class="fas fa-dice"></i>
                 </button>
             </div>
-
             <div class="filter-bar">
                 <input type="text" id="hard-search" placeholder="Search levels or creators…">
                 <div class="sort-btns">
@@ -86,7 +86,7 @@
             <h2>Submit a Level</h2>
             <div class="submit-form-container">
                 <iframe src="https://docs.google.com/forms/d/e/1FAIpQLSfXr9v8bAs1URpTSs3g0VIsoh1rGhg2VahoZzEOblMe3lrJYA/viewform?embedded=true" 
-                        width="100%" height="900" frameborder="0" marginheight="0" marginwidth="0">
+                        width="100%" height="1200" frameborder="0" marginheight="0" marginwidth="0">
                     Loading…
                 </iframe>
             </div>
