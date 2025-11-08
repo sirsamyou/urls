@@ -108,7 +108,7 @@ h2{
 }
 .random-btn:hover{transform:scale(1.2) rotate(25deg);}
 @keyframes float{
-    0%,100%{transform:translateY( 0px);}
+    0%,100%{transform:translateY(0px);}
     50%{transform:translateY(-8px);}
 }
 
@@ -117,15 +117,24 @@ h2{
     display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:1.8rem;
 }
 
-/* NEW GLITTER SPARKLE HOVER (per card) */
+/* FIXED RANK ICON SIZE */
+.rank-badge{
+    width:26px !important;
+    height:26px !important;
+    object-fit:contain;
+    filter:drop-shadow(0 0 6px rgba(0,198,255,.7));
+    vertical-align:middle;
+}
+
+/* CARD HOVER EFFECTS */
 .level-card{
     background:#1a1a22;border-radius:16px;overflow:hidden;
     box-shadow:0 6px 20px rgba(0,0,0,.4);
     cursor:pointer;position:relative;
     border:2px solid transparent;
     transition:transform .4s,box-shadow .4s;
-    opacity:1 !important;
-    transform:translateY(0) !important;
+    opacity:0;
+    transform:translateY(30px);
 }
 .level-card::before{
     content:'';position:absolute;top:-50%;left:-50%;width:200%;height:200%;
@@ -163,10 +172,6 @@ h2{
 .creator-info img{
     width:28px;height:28px;border-radius:50%;border:2px solid #00c6ff;
 }
-.rank-badge{
-    width:28px;height:28px;object-fit:contain;
-    filter:drop-shadow(0 0 6px rgba(0,198,255,.7));
-}
 
 /* ---------- LEVEL DETAIL ---------- */
 #level-detail-content{
@@ -180,23 +185,7 @@ h2{
     to{opacity:1;transform:none;}
 }
 
-/* ---------- PROFILE PAGE ANIMATIONS ---------- */
-#creator-profile-content .profile-banner{
-    animation:slideDown 1s ease-out;
-}
-#creator-profile-content .profile-header{
-    animation:slideUp 1s ease-out .3s both;
-}
-@keyframes slideDown{
-    from{transform:translateY(-100px);opacity:0;}
-    to{transform:none;opacity:1;}
-}
-@keyframes slideUp{
-    from{transform:translateY(100px);opacity:0;}
-    to{transform:none;opacity:1;}
-}
-
-/* ---------- LEADERBOARD ANIMATIONS ---------- */
+/* ---------- LEADERBOARD ---------- */
 .leaderboard-card{
     opacity:0;transform:translateY(40px);
     transition:all .8s ease-out;
@@ -209,19 +198,10 @@ h2{
     box-shadow:0 20px 50px rgba(0,198,255,.3);
 }
 
-/* ---------- FAQ & OTHER ---------- */
-.faq-section{
-    animation:fadeIn .8s ease-out;
-}
-.team-member{
-    transition:transform .4s;
-}
-.team-member:hover{transform:scale(1.08);}
-
 /* ---------- MOBILE ---------- */
 @media(max-width:768px){
     .hamburger{display:block;}
-    .nav{position:fixed;top:0;right:-100%;width:80%;height:100vh;
+    .nav{position:fixed severe;top:0;right:-100%;width:80%;height:100vh;
         background:#16161d;padding:2.5rem;transition:right .5s ease;z-index:999;
         backdrop-filter:blur(15px);
     }
@@ -232,6 +212,6 @@ h2{
     .filter-bar input{min-width:auto;}
     .levels-grid{grid-template-columns:1fr;gap:1.5rem;}
     .leaderboard-grid{grid-template-columns:1fr;}
-    .profile-header{flex-direction:column;text-align:center;}
     .random-btn{width:40px;height:40px;font-size:1.1rem;}
+    .rank-badge{width:24px!important;height:24px!important;}
 }
