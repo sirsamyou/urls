@@ -152,5 +152,117 @@
             "design": 9.0,
             "speedrunning": 7.2
         }
+    },
+    {
+        "id": 1745344120755,
+        "name": "Tight Triangles",
+        "creator": "sqm",
+        "thumbnail": "thumbs/tight-triangles.png",
+        "created": "2025-04-27",
+        "link": "https://narrowarrow.xyz/levelid=1745344120755",
+        "type": "speedrun",
+        "ratings": {
+            "gameplay": 7.9,
+            "design": 7.1,
+            "speedrunning": 8.1
+        }
+    },
+    {
+        "id": 1748371963362,
+        "name": "Orbit",
+        "creator": "Bertzz",
+        "thumbnail": "thumbs/orbit.png",
+        "created": "2025-05-27",
+        "link": "https://narrowarrow.xyz/levelid=1748371963362",
+        "type": "speedrun",
+        "ratings": {
+            "gameplay": 8.8,
+            "design": 6.5,
+            "speedrunning": 8.5
+        }
+    },
+    {
+        "id": 1746170302082,
+        "name": "Narrow Dots",
+        "creator": "Ripted",
+        "thumbnail": "thumbs/narrow-dots.png",
+        "created": "2025-05-03",
+        "link": "https://narrowarrow.xyz/levelid=1746170302082",
+        "type": "speedrun",
+        "ratings": {
+            "gameplay": 9.0,
+            "design": 8.4,
+            "speedrunning": 9.3
+        }
+    },
+    {
+        "id": 1746292928740,
+        "name": "Plasma Pads",
+        "creator": "Ripted",
+        "thumbnail": "thumbs/plasma-pads.png",
+        "created": "2025-05-05",
+        "link": "https://narrowarrow.xyz/levelid=1746292928740",
+        "type": "speedrun",
+        "ratings": {
+            "gameplay": 7.2,
+            "design": 7.7,
+            "speedrunning": 6.8
+        }
+    },
+    {
+        "id": 1745612667380,
+        "name": "Winding Ways",
+        "creator": "sqm",
+        "thumbnail": "thumbs/winding-ways.png",
+        "created": "2025-04-26",
+        "link": "https://narrowarrow.xyz/levelid=1745612667380",
+        "type": "speedrun",
+        "ratings": {
+            "gameplay": 8.3,
+            "design": 6.2,
+            "speedrunning": 8.5
+        }
+    },
+    {
+        "id": 1754946360411,
+        "name": "Circe Turns",
+        "creator": "Hambadem",
+        "thumbnail": "thumbs/circe-turns.png",
+        "created": "2025-07-15",
+        "link": "https://narrowarrow.xyz/levelid=1754946360411",
+        "type": "speedrun",
+        "ratings": {
+            "gameplay": 7.1,
+            "design": 7.4,
+            "speedrunning": 7.7
+        }
+    },
+    {
+        "id": 1753463107594,
+        "name": "Bouncing Triangles",
+        "creator": "RandomFunk",
+        "thumbnail": "thumbs/bouncing-triangles.png",
+        "created": "2025-07-23",
+        "link": "https://narrowarrow.xyz/levelid=1753463107594",
+        "type": "speedrun",
+        "ratings": {
+            "gameplay": 6.4,
+            "design": 6.9,
+            "speedrunning": 6.7
+        }
+    },
+    {
+        "id": 1758192212495,
+        "name": "Web",
+        "creator": "Paul",
+        "thumbnail": "thumbs/web.png",
+        "created": "2025-09-20",
+        "link": "https://narrowarrow.xyz/levelid=1758192212495",
+        "type": "speedrun",
+        "ratings": {
+            "gameplay": 8.8,
+            "design": 9.8,
+            "speedrunning": 7.7
+        }
     }
 ]
