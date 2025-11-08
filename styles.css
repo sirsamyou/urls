@@ -77,7 +77,7 @@ h2{
 }
 .sort-btns{display:flex;gap:.4rem;}
 .sort-btn{
-    background:#1e1e28;border:none;color:#:#aaa;
+    background:#1e1e28;border:none;color:#aaa;
     padding:.45rem .9rem;border-radius:6px;
     font-size:.9rem;display:flex;align-items:center;gap:.4rem;
     cursor:pointer;transition:all .25s;
@@ -447,8 +447,7 @@ h2{
     -webkit-text-fill-color:transparent;
 }
 
-/* ---------- SCROLL ANIMATIONS (removed - no longer needed for level cards) ---------- */
-/* Old classes kept only if still used elsewhere (leaderboard cards) */
+/* ---------- SCROLL ANIMATIONS (kept for leaderboard cards) ---------- */
 .animate-ready {
     opacity: 0;
     transform: translateY(30px);
@@ -459,8 +458,6 @@ h2{
     opacity: 1 !important;
     transform: translateY(0) !important;
 }
-
-/* Stagger delays removed - no longer used for level cards */
 
 /* ---------- MICRO-INTERACTIONS ---------- */
 .avatar-click {
