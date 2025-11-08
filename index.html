@@ -3,20 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="URLS – Unofficial Rating Levels System for Narrow Arrow Speedrun and Hard Levels">
+    <meta name="description" content="URLS – Unofficial Rating Levels System for Narrow Arrow Speedrun & Hard Levels">
     <meta property="og:title" content="URLS – Unofficial Rating Levels System">
-    <meta property="og:description" content="Community-driven ratings for Narrow Arrow speedrun and hard levels.">
-    <meta property="og:image" content="https://urls.gd/assets/mythicranking.png">
-    <meta property="og:url" content="https://urls.gd">
+    <meta property="og:description" content="Community-rated Speedrun and Hard levels for Narrow Arrow.">
+    <meta property="og:image" content="assets/mythicranking.png">
     <title>URLS – Unofficial Rating Levels System</title>
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/brands.min.css">
     <link rel="icon" href="assets/mythicranking.png" type="image/png">
     <style>
-        /* Hotfix for Google Forms iframe */
         iframe { min-height: 1400px !important; border: none; }
-        .loading-spinner { display: flex; justify-content: center; align-items: center; height: 200px; }
         .skeleton { background: #222; border-radius: 12px; animation: pulse 1.5s infinite; }
         @keyframes pulse { 0%,100% {opacity: .6} 50% {opacity: 1} }
         .level-card.skeleton { height: 320px; }
@@ -37,88 +34,26 @@
                     <li><a href="#" data-page="faq">FAQ</a></li>
                 </ul>
             </nav>
-            <a href="https://discord.gg/7RseZpdxdU" class="discord-btn" target="_blank" title="Join Discord">
+            <a href="https://discord.gg/7RseZpdxdU" class="discord-btn" target="_blank">
                 <i class="fab fa-discord"></i>
             </a>
         </div>
     </header>
 
     <main class="container">
-        <!-- Speedrun Page -->
-        <section id="speedrun" class="page active">
-            <h2>Speedrun Levels</h2>
-            <div class="random-level-wrapper">
-                <button id="random-speedrun-btn" class="random-btn" aria-label="Random Rated Speedrun Level">
-                    <i class="fas fa-dice"></i>
-                </button>
-            </div>
-            <div class="filter-bar">
-                <input type="text" id="speedrun-search" placeholder="Search levels or creators…">
-                <div class="sort-btns">
-                    <button data-type="speedrun" data-sort="recent" class="sort-btn"><i class="fas fa-clock"></i> Recent</button>
-                    <button data-type="speedrun" data-sort="rated" class="sort-btn active"><i class="fas fa-star"></i> Rating</button>
-                </div>
-            </div>
-            <div id="speedrun-list" class="levels-grid"></div>
-        </section>
+        <section id="speedrun" class="page active"><h2>Speedrun Levels</h2><div class="random-level-wrapper"><button id="random-speedrun-btn" class="random-btn"><i class="fas fa-dice"></i></button></div><div class="filter-bar"><input type="text" id="speedrun-search" placeholder="Search levels or creators…"><div class="sort-btns"><button data-type="speedrun" data-sort="recent" class="sort-btn"><i class="fas fa-clock"></i> Recent</button><button data-type="speedrun" data-sort="rated" class="sort-btn active"><i class="fas fa-star"></i> Rating</button></div></div><div id="speedrun-list" class="levels-grid"></div></section>
 
-        <!-- Hard Page -->
-        <section id="hard" class="page">
-            <h2>Hard Levels</h2>
-            <div class="random-level-wrapper">
-                <button id="random-hard-btn" class="random-btn" aria-label="Random Rated Hard Level">
-                    <i class="fas fa-dice"></i>
-                </button>
-            </div>
-            <div class="filter-bar">
-                <input type="text" id="hard-search" placeholder="Search levels or creators…">
-                <div class="sort-btns">
-                    <button data-type="hard" data-sort="recent" class="sort-btn"><i class="fas fa-clock"></i> Recent</button>
-                    <button data-type="hard" data-sort="rated" class="sort-btn active"><i class="fas fa-star"></i> Rating</button>
-                </div>
-            </div>
-            <div id="hard-list" class="levels-grid"></div>
-        </section>
+        <section id="hard" class="page"><h2>Hard Levels</h2><div class="random-level-wrapper"><button id="random-hard-btn" class="random-btn"><i class="fas fa-dice"></i></button></div><div class="filter-bar"><input type="text" id="hard-search" placeholder="Search levels or creators…"><div class="sort-btns"><button data-type="hard" data-sort="recent" class="sort-btn"><i class="fas fa-clock"></i> Recent</button><button data-type="hard" data-sort="rated" class="sort-btn active"><i class="fas fa-star"></i> Rating</button></div></div><div id="hard-list" class="levels-grid"></div></section>
 
-        <!-- Leaderboard Page -->
-        <section id="leaderboard" class="page">
-            <h2>Leaderboard</h2>
-            <div class="leaderboard-tabs">
-                <button data-lb="points" class="lb-tab active">Creator Points</button>
-                <button data-lb="total" class="lb-tab">Total Maps</button>
-                <button data-lb="speedrun" class="lb-tab">Speedrun Maps</button>
-                <button data-lb="hard" class="lb-tab">Hard Maps</button>
-            </div>
-            <div id="leaderboard-list" class="leaderboard-grid animate-ready"></div>
-        </section>
+        <section id="leaderboard" class="page"><h2>Leaderboard</h2><div class="leaderboard-tabs"><button data-lb="points" class="lb-tab active">Creator Points</button><button data-lb="total" class="lb-tab">Total Maps</button><button data-lb="speedrun" class="lb-tab">Speedrun Maps</button><button data-lb="hard" class="lb-tab">Hard Maps</button></div><div id="leaderboard-list" class="leaderboard-grid animate-ready"></div></section>
 
-        <!-- Submit Page -->
-        <section id="submit" class="page">
-            <h2>Submit a Level</h2>
-            <div class="submit-form-container">
-                <iframe src="https://docs.google.com/forms/d/e/1FAIpQLSfXr9v8bAs1URpTSs3g0VIsoh1rGhg2VahoZzEOblMe3lrJYA/viewform?embedded=true" 
-                        width="100%" height="1400" frameborder="0" marginheight="0" marginwidth="0">
-                    Loading…
-                </iframe>
-            </div>
-        </section>
+        <section id="submit" class="page"><h2>Submit a Level</h2><div class="submit-form-container"><iframe src="https://docs.google.com/forms/d/e/1FAIpQLSfXr9v8bAs1URpTSs3g0VIsoh1rGhg2VahoZzEOblMe3lrJYA/viewform?embedded=true" width="100%" height="1400" frameborder="0">Loading…</iframe></div></section>
 
-        <!-- FAQ Page -->
-        <section id="faq" class="page">
-            <div id="faq-content"></div>
-        </section>
+        <section id="faq" class="page"><div id="faq-content"></div></section>
 
-        <!-- Level Detail Page -->
-        <section id="level-detail-page" class="page">
-            <button class="back-btn"><i class="fas fa-arrow-left"></i> Back</button>
-            <div id="level-detail-content"></div>
-        </section>
+        <section id="level-detail-page" class="page"><button class="back-btn"><i class="fas fa-arrow-left"></i> Back</button><div id="level-detail-content"></div></section>
 
-        <!-- Creator Profile Page -->
-        <section id="creator-profile-page" class="page">
-            <button class="back-btn"><i class="fas fa-arrow-left"></i> Back</button>
-            <div id="creator-profile-content"></div>
-        </section>
+        <section id="creator-profile-page" class="page"><button class="back-btn"><i class="fas fa-arrow-left"></i> Back</button><div id="creator-profile-content"></div></section>
     </main>
 
     <script src="script.js"></script>
